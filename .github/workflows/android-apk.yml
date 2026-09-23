@@ -11,7 +11,6 @@ permissions:
 
 jobs:
   build:
-    # Usiamo ubuntu-22.04 che è super stabile per Android ed evita i warning di aggiornamento
     runs-on: ubuntu-22.04
 
     steps:
@@ -41,6 +40,17 @@ jobs:
           fi
           npx cap sync android
 
+      - name: Copy custom icons
+        run: |
+          if [ -d icon-assets/res ]; then
+            cp -rf icon-assets/res/. android/app/src/main/res/
+          elif [ -d icon-assets ]; then
+            cp -rf icon-assets/. android/app/src/main/res/
+          fi
+
+      - name: Set versionCode from GitHub run number
+        run: sed -i -E "s/versionCode [0-9]+/versionCode ${{ github.run_number }}/" android/app/build.gradle
+
       - name: Make gradlew executable
         run: chmod +x android/gradlew
 
@@ -54,8 +64,7 @@ jobs:
           ./gradlew assembleDebug --no-daemon
 
       - name: Rename APK
-        run: |
-          mv android/app/build/outputs/apk/debug/app-debug.apk registro-neonato-debug.apk
+        run: mv android/app/build/outputs/apk/debug/app-debug.apk registro-neonato-debug.apk
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
