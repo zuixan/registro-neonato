@@ -1,0 +1,10 @@
+{
+  "appId": "com.zui.registroneonato",
+  "appName": "Registro Neonato",
+  "webDir": "www",
+  "backgroundColor": "#fff7f2",
+  "android": {
+    "backgroundColor": "#fff7f2",
+    "allowMixedContent": false
+  }
+}

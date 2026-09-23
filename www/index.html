@@ -1,0 +1,2053 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#fff7f2">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>Registro Neonato</title>
+
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #fff7f2;
+      --bg-soft: #fff0f4;
+      --card: #ffffff;
+      --text: #3b2b35;
+      --muted: #8d7886;
+      --line: rgba(59, 43, 53, .10);
+      --shadow: 0 12px 30px rgba(101, 61, 80, .10);
+      --accent: #ff7fa5;
+      --accent-soft: #ffe8ef;
+      --blue: #d9efff;
+      --brown: #f4e3cf;
+      --pink: #ffe4ec;
+      --green: #ddf6e8;
+      --danger: #d94a5f;
+    }
+
+    html[data-theme="dark"] {
+      color-scheme: dark;
+      --bg: #141017;
+      --bg-soft: #1b1620;
+      --card: #221c29;
+      --text: #f9f2f6;
+      --muted: #b6a4b1;
+      --line: rgba(255, 255, 255, .10);
+      --shadow: 0 14px 34px rgba(0, 0, 0, .35);
+      --accent: #ff87ab;
+      --accent-soft: #3a2430;
+      --blue: #203446;
+      --brown: #3a2e22;
+      --pink: #402431;
+      --green: #1f3a30;
+      --danger: #ff7d8f;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, Arial, sans-serif;
+      background:
+        radial-gradient(circle at top left, var(--bg-soft), transparent 28%),
+        radial-gradient(circle at top right, var(--accent-soft), transparent 22%),
+        var(--bg);
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+      touch-action: manipulation;
+      min-height: 100dvh;
+    }
+
+    button,
+    input,
+    textarea {
+      font: inherit;
+      color: inherit;
+    }
+
+    button {
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    :focus-visible {
+      outline: 3px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    body.modal-open {
+      overflow: hidden;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .hint {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.4;
+      margin-top: 6px;
+    }
+
+    .mt {
+      margin-top: 10px;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: calc(env(safe-area-inset-top) + 14px) 16px 12px;
+      background: color-mix(in srgb, var(--bg) 86%, transparent);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .topbar h1 {
+      margin: 0;
+      font-size: 22px;
+      line-height: 1.1;
+      letter-spacing: -.03em;
+    }
+
+    .topbar p {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .icon-btn {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: var(--card);
+      display: grid;
+      place-items: center;
+      font-size: 18px;
+      cursor: pointer;
+      box-shadow: var(--shadow);
+      flex: 0 0 auto;
+    }
+
+    main {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 16px 16px calc(28px + env(safe-area-inset-bottom));
+      display: grid;
+      gap: 14px;
+    }
+
+    .warning {
+      padding: 13px 14px;
+      border-radius: 18px;
+      background: rgba(255, 180, 80, .16);
+      border: 1px solid rgba(255, 160, 60, .28);
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    .panel,
+    .stat,
+    .action,
+    .timer {
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+    }
+
+    .actions-main {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    @media (max-width: 380px) {
+      .actions-main {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    .action {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 94px;
+      padding: 14px 10px;
+      border-radius: 24px;
+      background: var(--card);
+      cursor: pointer;
+      text-align: center;
+      transition: transform .12s ease;
+    }
+
+    .action:active {
+      transform: scale(.975);
+    }
+
+    .action .big {
+      width: 50px;
+      height: 50px;
+      border-radius: 18px;
+      display: grid;
+      place-items: center;
+      font-size: 28px;
+      background: var(--bg-soft);
+      flex: 0 0 auto;
+    }
+
+    .action.blue .big { background: var(--blue); }
+    .action.brown .big { background: var(--brown); }
+    .action.pink .big { background: var(--pink); }
+    .action.green .big { background: var(--green); }
+
+    .action .label {
+      display: block;
+      font-size: 15px;
+      font-weight: 900;
+      line-height: 1.15;
+      letter-spacing: -.02em;
+      min-width: 0;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .stat {
+      background: var(--card);
+      border-radius: 22px;
+      padding: 14px;
+      width: 100%;
+      text-align: left;
+      cursor: pointer;
+      transition: transform .12s ease;
+    }
+
+    .stat:active {
+      transform: scale(.98);
+    }
+
+    .stat .emoji {
+      font-size: 20px;
+      line-height: 1;
+    }
+
+    .stat strong {
+      display: block;
+      font-size: 24px;
+      line-height: 1.1;
+      margin: 8px 0 3px;
+      letter-spacing: -.04em;
+      word-break: break-word;
+    }
+
+    .stat small {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .panel {
+      border-radius: 26px;
+      padding: 16px;
+      background: var(--card);
+    }
+
+    .panel.compact {
+      padding: 12px 14px;
+    }
+
+    .panel-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .panel-head h2 {
+      margin: 0;
+      font-size: 18px;
+      letter-spacing: -.03em;
+    }
+
+    .panel-head-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .panel-head .icon-btn {
+      width: 38px;
+      height: 38px;
+      font-size: 16px;
+    }
+
+    .timer {
+      border-radius: 26px;
+      padding: 16px;
+      background: linear-gradient(135deg, var(--accent-soft), var(--card));
+    }
+
+    .timer-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .timer strong {
+      display: block;
+      font-size: 18px;
+      letter-spacing: -.03em;
+    }
+
+    .timer-time {
+      font-size: 34px;
+      font-weight: 900;
+      letter-spacing: -.06em;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
+    .day {
+      margin: 16px 0 8px;
+      font-size: 12px;
+      font-weight: 900;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .07em;
+    }
+
+    .day:first-child {
+      margin-top: 0;
+    }
+
+    .event {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px;
+      border-radius: 20px;
+      background: var(--bg);
+      border: 1px solid var(--line);
+      margin-bottom: 8px;
+    }
+
+    .event-emoji {
+      width: 40px;
+      height: 40px;
+      border-radius: 15px;
+      display: grid;
+      place-items: center;
+      font-size: 21px;
+      background: var(--card);
+      border: 1px solid var(--line);
+      flex: 0 0 auto;
+    }
+
+    .event-body {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .event-title {
+      font-size: 15px;
+      font-weight: 900;
+      letter-spacing: -.02em;
+    }
+
+    .event-sub {
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.4;
+      font-weight: 600;
+      overflow-wrap: anywhere;
+    }
+
+    .delete {
+      border: 0;
+      background: transparent;
+      color: var(--muted);
+      font-size: 18px;
+      line-height: 1;
+      padding: 9px;
+      border-radius: 12px;
+      cursor: pointer;
+      flex: 0 0 auto;
+    }
+
+    .empty {
+      padding: 30px 18px;
+      text-align: center;
+      color: var(--muted);
+      border: 1px dashed var(--line);
+      border-radius: 22px;
+      background: var(--bg);
+      line-height: 1.55;
+      font-weight: 700;
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+      background: rgba(25, 12, 20, .48);
+    }
+
+    .modal.open {
+      display: flex;
+    }
+
+    .sheet {
+      width: min(620px, 100%);
+      max-height: 92vh;
+      max-height: 92dvh;
+      overflow: auto;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-bottom: 0;
+      border-radius: 28px 28px 0 0;
+      padding: 16px 16px calc(20px + env(safe-area-inset-bottom));
+      animation: sheetUp .22s ease;
+    }
+
+    @keyframes sheetUp {
+      from {
+        opacity: .6;
+        transform: translateY(18px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (min-width: 720px) {
+      .modal {
+        align-items: center;
+        padding: 18px;
+      }
+
+      .sheet {
+        border-radius: 28px;
+        border-bottom: 1px solid var(--line);
+      }
+    }
+
+    .sheet-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 4px;
+    }
+
+    .sheet-head h3 {
+      margin: 0;
+      font-size: 21px;
+      letter-spacing: -.04em;
+    }
+
+    .field {
+      display: block;
+      margin: 15px 0;
+    }
+
+    .field-label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 13px;
+      font-weight: 900;
+      color: var(--muted);
+    }
+
+    input,
+    textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      background: var(--bg);
+      border-radius: 16px;
+      padding: 13px 14px;
+      font-size: 16px;
+    }
+
+    textarea {
+      min-height: 76px;
+      resize: vertical;
+    }
+
+    .chips {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 5px;
+      scrollbar-width: none;
+    }
+
+    .chips::-webkit-scrollbar {
+      display: none;
+    }
+
+    .chip {
+      position: relative;
+      flex: 0 0 auto;
+    }
+
+    .chip input {
+      position: absolute;
+      opacity: 0;
+      width: 1px;
+      height: 1px;
+      margin: 0;
+    }
+
+    .chip span,
+    .chip-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 11px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: var(--bg);
+      font-weight: 800;
+      white-space: nowrap;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .chip-button {
+      flex: 0 0 auto;
+    }
+
+    .chip input:checked + span {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+      box-shadow: 0 10px 22px rgba(255, 127, 165, .22);
+    }
+
+    .btn-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .btn {
+      border: 0;
+      border-radius: 18px;
+      min-height: 52px;
+      padding: 14px 16px;
+      font-weight: 900;
+      cursor: pointer;
+      letter-spacing: -.02em;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .btn-ghost {
+      background: var(--bg);
+      border: 1px solid var(--line);
+      color: var(--text);
+    }
+
+    .btn-danger {
+      background: rgba(255, 90, 110, .12);
+      color: var(--danger);
+      border: 1px solid rgba(255, 90, 110, .18);
+    }
+
+    .btn-wide {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: calc(18px + env(safe-area-inset-bottom));
+      transform: translateX(-50%) translateY(18px);
+      z-index: 200;
+      max-width: calc(100vw - 36px);
+      padding: 12px 18px;
+      border-radius: 999px;
+      background: var(--text);
+      color: var(--bg);
+      font-weight: 900;
+      box-shadow: var(--shadow);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .2s ease, transform .2s ease;
+      text-align: center;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+  </style>
+</head>
+
+<body>
+  <header class="topbar">
+    <div>
+      <h1>🍼 Registro Neonato</h1>
+      <p id="topDate">Caricamento…</p>
+    </div>
+    <button id="themeBtn" class="icon-btn" type="button" aria-label="Cambia tema">🌙</button>
+  </header>
+
+  <main>
+    <section id="storageWarning" class="warning hidden">
+      ⚠️ <strong>Modalità test:</strong> il browser non può salvare i dati in modo permanente da questo percorso. Nell’APK normalmente funziona tutto in modo locale.
+    </section>
+
+    <section id="timerCard" class="timer hidden">
+      <div class="timer-top">
+        <div>
+          <strong>Poppata in corso</strong>
+          <div class="muted" id="timerSide"></div>
+          <div class="muted">Iniziata alle <span id="timerStarted"></span></div>
+        </div>
+        <div class="timer-time" id="timerElapsed">00:00</div>
+      </div>
+
+      <div class="btn-row">
+        <button id="btnTimerEdit" class="btn btn-ghost" type="button">✏️ Modifica</button>
+        <button id="btnTimerSave" class="btn btn-primary" type="button">✅ Salva</button>
+      </div>
+
+      <button id="btnTimerCancel" class="btn btn-danger btn-wide mt" type="button">Annulla timer</button>
+    </section>
+
+    <section class="actions-main">
+      <button id="btnFeed" class="action pink" type="button">
+        <span class="big">🤱</span>
+        <span class="label">Poppata</span>
+      </button>
+
+      <button id="btnPee" class="action blue" type="button">
+        <span class="big">💧</span>
+        <span class="label">Pipì</span>
+      </button>
+
+      <button id="btnPoop" class="action brown" type="button">
+        <span class="big">💩</span>
+        <span class="label">Cacca</span>
+      </button>
+    </section>
+
+    <section class="stats">
+      <button class="stat" type="button" data-list="pipi">
+        <span class="emoji">💧</span>
+        <strong id="statPee">0</strong>
+        <small>Pipì oggi</small>
+      </button>
+
+      <button class="stat" type="button" data-list="cacca">
+        <span class="emoji">💩</span>
+        <strong id="statPoop">0</strong>
+        <small>Cacca oggi</small>
+      </button>
+
+      <button class="stat" type="button" data-list="poppata">
+        <span class="emoji">🤱</span>
+        <strong id="statFeed">0</strong>
+        <small>Poppate oggi</small>
+      </button>
+
+      <button class="stat" type="button" data-list="poppata">
+        <span class="emoji">⏱️</span>
+        <strong id="statFeedTime">0 min</strong>
+        <small>Latte oggi</small>
+      </button>
+    </section>
+
+    <section class="panel compact">
+      <div id="lastFeedLine" class="muted">Ultima poppata: —</div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <h2>Ultimi eventi</h2>
+        <div class="panel-head-right">
+          <span id="eventCount" class="muted"></span>
+          <button id="btnExportAction" class="icon-btn" type="button" aria-label="Esporta dati">📤</button>
+        </div>
+      </div>
+      <div id="events"></div>
+    </section>
+  </main>
+
+  <div id="modalPee" class="modal">
+    <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="titlePee">
+      <div class="sheet-head">
+        <h3 id="titlePee">💧 Pipì</h3>
+        <button class="icon-btn" type="button" data-close aria-label="Chiudi">✕</button>
+      </div>
+
+      <form id="formPee">
+        <label class="field">
+          <span class="field-label">Quando</span>
+          <input id="peeWhen" type="datetime-local" required>
+        </label>
+
+        <label class="field">
+          <span class="field-label">Note</span>
+          <textarea id="peeNote" maxlength="300" placeholder="Facoltativo"></textarea>
+        </label>
+
+        <div class="btn-row">
+          <button class="btn btn-ghost" type="button" data-close>Annulla</button>
+          <button class="btn btn-primary" type="submit">Salva</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="modalPoop" class="modal">
+    <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="titlePoop">
+      <div class="sheet-head">
+        <h3 id="titlePoop">💩 Cacca</h3>
+        <button class="icon-btn" type="button" data-close aria-label="Chiudi">✕</button>
+      </div>
+
+      <form id="formPoop">
+        <label class="field">
+          <span class="field-label">Quando</span>
+          <input id="poopWhen" type="datetime-local" required>
+        </label>
+
+        <div class="field">
+          <span class="field-label">Colore</span>
+          <div class="chips">
+            <label class="chip">
+              <input type="radio" name="poopColor" value="giallo" required>
+              <span>🟡 Giallo/senape</span>
+            </label>
+
+            <label class="chip">
+              <input type="radio" name="poopColor" value="gialloverde">
+              <span>🌿 Giallo-verde</span>
+            </label>
+
+            <label class="chip">
+              <input type="radio" name="poopColor" value="verde">
+              <span>🟢 Verde</span>
+            </label>
+
+            <label class="chip">
+              <input type="radio" name="poopColor" value="marrone">
+              <span>🟤 Marrone</span>
+            </label>
+
+            <label class="chip">
+              <input type="radio" name="poopColor" value="scura">
+              <span>⚫ Scura/nera</span>
+            </label>
+
+            <label class="chip">
+              <input type="radio" name="poopColor" value="rossa">
+              <span>🔴 Tracce rosse</span>
+            </label>
+
+            <label class="chip">
+              <input type="radio" name="poopColor" value="altro">
+              <span>❓ Altro</span>
+            </label>
+          </div>
+          <span class="hint">Questa app registra dati, non fornisce diagnosi o consigli medici.</span>
+        </div>
+
+        <label class="field">
+          <span class="field-label">Note</span>
+          <textarea id="poopNote" maxlength="300" placeholder="Facoltativo"></textarea>
+        </label>
+
+        <div class="btn-row">
+          <button class="btn btn-ghost" type="button" data-close>Annulla</button>
+          <button class="btn btn-primary" type="submit">Salva</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="modalFeed" class="modal">
+    <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="titleFeed">
+      <div class="sheet-head">
+        <h3 id="titleFeed">🤱 Poppata</h3>
+        <button class="icon-btn" type="button" data-close aria-label="Chiudi">✕</button>
+      </div>
+
+      <form id="formFeed">
+        <div class="field">
+          <span class="field-label">Seno</span>
+          <div class="chips">
+            <label class="chip">
+              <input type="radio" name="side" value="dx">
+              <span>👉 Destro</span>
+            </label>
+
+            <label class="chip">
+              <input type="radio" name="side" value="sx">
+              <span>👈 Sinistro</span>
+            </label>
+
+            <label class="chip">
+              <input type="radio" name="side" value="both">
+              <span>💞 Entrambi</span>
+            </label>
+          </div>
+        </div>
+
+        <label class="field">
+          <span class="field-label">Quando</span>
+          <input id="feedWhen" type="datetime-local" required>
+        </label>
+
+        <label class="field">
+          <span class="field-label">Durata in minuti</span>
+          <input id="feedDuration" type="number" inputmode="numeric" min="1" max="1440" step="1" placeholder="Es. 15">
+        </label>
+
+        <div class="chips">
+          <button class="chip-button" type="button" data-minutes="5">5 min</button>
+          <button class="chip-button" type="button" data-minutes="10">10 min</button>
+          <button class="chip-button" type="button" data-minutes="15">15 min</button>
+          <button class="chip-button" type="button" data-minutes="20">20 min</button>
+          <button class="chip-button" type="button" data-minutes="30">30 min</button>
+          <button class="chip-button" type="button" data-minutes="45">45 min</button>
+        </div>
+
+        <label class="field">
+          <span class="field-label">Note</span>
+          <textarea id="feedNote" maxlength="300" placeholder="Facoltativo"></textarea>
+        </label>
+
+        <div class="btn-row">
+          <button id="btnStartTimer" class="btn btn-ghost" type="button">⏱️ Avvia timer</button>
+          <button class="btn btn-primary" type="submit">💾 Salva</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="modalExport" class="modal">
+    <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="titleExport">
+      <div class="sheet-head">
+        <h3 id="titleExport">📤 Esporta dati</h3>
+        <button class="icon-btn" type="button" data-close aria-label="Chiudi">✕</button>
+      </div>
+
+      <p class="muted">
+        Il CSV va bene per Excel o Google Sheets. Il JSON è un backup completo e può essere reimportato.
+      </p>
+
+      <div class="btn-row">
+        <button id="btnCsv" class="btn btn-primary" type="button">📊 CSV</button>
+        <button id="btnJson" class="btn btn-ghost" type="button">💾 JSON</button>
+      </div>
+
+      <label class="btn btn-ghost btn-wide mt">
+        📥 Importa JSON
+        <input id="importFile" type="file" accept="application/json,.json" hidden>
+      </label>
+
+      <button class="btn btn-ghost btn-wide mt" type="button" data-close>Chiudi</button>
+    </div>
+  </div>
+
+  <div id="modalList" class="modal">
+    <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="listTitle">
+      <div class="sheet-head">
+        <h3 id="listTitle">Elenco</h3>
+        <button class="icon-btn" type="button" data-close aria-label="Chiudi">✕</button>
+      </div>
+      <div id="listEvents"></div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    const $ = (selector, root = document) => root.querySelector(selector);
+    const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
+
+    const EVENTS_KEY = 'registro-neonato.events.v1';
+    const TIMER_KEY = 'registro-neonato.timer.v1';
+    const THEME_KEY = 'registro-neonato.theme.v1';
+
+    const storageOk = (function () {
+      try {
+        localStorage.setItem('__registro_neonato_test__', '1');
+        localStorage.removeItem('__registro_neonato_test__');
+        return true;
+      } catch (error) {
+        return false;
+      }
+    })();
+
+    let events = [];
+    let feedTimer = null;
+    let timerEditMode = false;
+    let clockInterval = null;
+    let toastTimeout = null;
+    let currentListType = null;
+
+    const TYPE_META = {
+      pipi: { label: 'Pipì', emoji: '💧' },
+      cacca: { label: 'Cacca', emoji: '💩' },
+      poppata: { label: 'Poppata', emoji: '🍼' }
+    };
+
+    const LIST_TITLES = {
+      pipi: 'Elenco pipì',
+      cacca: 'Elenco cacca',
+      poppata: 'Elenco poppate'
+    };
+
+    const SIDE_META = {
+      dx: { label: 'Seno destro', short: 'destro', emoji: '👉' },
+      sx: { label: 'Seno sinistro', short: 'sinistro', emoji: '👈' },
+      both: { label: 'Entrambi i seni', short: 'entrambi', emoji: '💞' }
+    };
+
+    const POOP_COLORS = {
+      giallo: { label: 'Giallo/senape', emoji: '🟡' },
+      gialloverde: { label: 'Giallo-verde', emoji: '🌿' },
+      verde: { label: 'Verde', emoji: '🟢' },
+      marrone: { label: 'Marrone', emoji: '🟤' },
+      scura: { label: 'Scura/nera', emoji: '⚫' },
+      rossa: { label: 'Con tracce rosse', emoji: '🔴' },
+      altro: { label: 'Altro', emoji: '❓' }
+    };
+
+    const pad = value => String(value).padStart(2, '0');
+
+    function esc(value) {
+      return String(value ?? '').replace(/[&<>"']/g, function (character) {
+        return {
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          '"': '&quot;',
+          "'": '&#39;'
+        }[character];
+      });
+    }
+
+    function uid() {
+      try {
+        if (window.crypto && typeof window.crypto.randomUUID === 'function') {
+          return window.crypto.randomUUID();
+        }
+      } catch (error) {
+        console.warn(error);
+      }
+
+      return 'id-' + Date.now() + '-' + Math.random().toString(36).slice(2, 10);
+    }
+
+    function isNativePlatform() {
+      return !!(window.Capacitor &&
+        typeof window.Capacitor.isNativePlatform === 'function' &&
+        window.Capacitor.isNativePlatform());
+    }
+
+    function dayKey(value) {
+      const date = new Date(value);
+      date.setHours(0, 0, 0, 0);
+      return date.getTime();
+    }
+
+    function fmtTime(iso) {
+      const date = new Date(iso);
+      if (isNaN(date)) return '';
+      return date.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
+    }
+
+    function fmtDayLabel(iso) {
+      const date = new Date(iso);
+      if (isNaN(date)) return '';
+
+      const today = new Date();
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+
+      if (dayKey(date) === dayKey(today)) return 'Oggi';
+      if (dayKey(date) === dayKey(yesterday)) return 'Ieri';
+
+      const text = date.toLocaleDateString('it-IT', {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long'
+      });
+
+      return text.charAt(0).toUpperCase() + text.slice(1);
+    }
+
+    function fmtDuration(minutes) {
+      const value = Math.max(0, Math.round(Number(minutes) || 0));
+      if (value <= 0) return '0 min';
+
+      const hours = Math.floor(value / 60);
+      const mins = value % 60;
+
+      if (hours === 0) return mins + ' min';
+      if (mins === 0) return hours + ' h';
+      return hours + ' h ' + mins + ' min';
+    }
+
+    function ago(iso) {
+      const date = new Date(iso);
+      if (isNaN(date)) return '';
+
+      const diff = Date.now() - date.getTime();
+      if (diff < 0) return 'evento futuro';
+
+      const minutes = Math.floor(diff / 60000);
+      if (minutes < 1) return 'adesso';
+      if (minutes < 60) return minutes + ' min fa';
+
+      const hours = Math.floor(minutes / 60);
+      const remainingMinutes = minutes % 60;
+
+      if (hours < 24) {
+        return remainingMinutes
+          ? hours + ' h e ' + remainingMinutes + ' min fa'
+          : hours + ' h fa';
+      }
+
+      const days = Math.floor(hours / 24);
+      return days === 1 ? '1 giorno fa' : days + ' giorni fa';
+    }
+
+    function toLocalInput(date = new Date()) {
+      const value = new Date(date);
+      if (isNaN(value)) value = new Date();
+
+      return [
+        value.getFullYear(),
+        '-',
+        pad(value.getMonth() + 1),
+        '-',
+        pad(value.getDate()),
+        'T',
+        pad(value.getHours()),
+        ':',
+        pad(value.getMinutes())
+      ].join('');
+    }
+
+    function fromLocalInput(value) {
+      if (!value) return new Date();
+      const date = new Date(value);
+      return isNaN(date) ? new Date() : date;
+    }
+
+    function formatDateTimePlain(iso) {
+      const date = new Date(iso);
+      if (isNaN(date)) return '';
+
+      return date.getFullYear() + '-' +
+        pad(date.getMonth() + 1) + '-' +
+        pad(date.getDate()) + ' ' +
+        pad(date.getHours()) + ':' +
+        pad(date.getMinutes());
+    }
+
+    function dateStamp() {
+      const date = new Date();
+      return date.getFullYear() + pad(date.getMonth() + 1) + pad(date.getDate());
+    }
+
+    function loadEvents() {
+      if (!storageOk) return [];
+
+      try {
+        const raw = localStorage.getItem(EVENTS_KEY);
+        if (!raw) return [];
+
+        const parsed = JSON.parse(raw);
+        if (!Array.isArray(parsed)) return [];
+
+        return parsed.filter(function (event) {
+          return event &&
+            TYPE_META[event.type] &&
+            event.when &&
+            !isNaN(new Date(event.when));
+        });
+      } catch (error) {
+        console.error(error);
+        return [];
+      }
+    }
+
+    function persistEvents() {
+      if (!storageOk) return;
+
+      try {
+        localStorage.setItem(EVENTS_KEY, JSON.stringify(events));
+      } catch (error) {
+        console.error(error);
+        toast('Salvataggio non riuscito');
+      }
+    }
+
+    function loadTimer() {
+      if (!storageOk) return null;
+
+      try {
+        const raw = localStorage.getItem(TIMER_KEY);
+        if (!raw) return null;
+
+        const timer = JSON.parse(raw);
+        if (!timer || !timer.startAt || !SIDE_META[timer.side]) return null;
+
+        return timer;
+      } catch (error) {
+        console.error(error);
+        return null;
+      }
+    }
+
+    function persistTimer() {
+      if (!storageOk) return;
+
+      try {
+        if (feedTimer) {
+          localStorage.setItem(TIMER_KEY, JSON.stringify(feedTimer));
+        } else {
+          localStorage.removeItem(TIMER_KEY);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    function addEvent(data) {
+      const when = data.when ? new Date(data.when) : new Date();
+
+      const event = {
+        id: uid(),
+        type: data.type,
+        when: isNaN(when) ? new Date().toISOString() : when.toISOString(),
+        side: SIDE_META[data.side] ? data.side : null,
+        durationMin: data.durationMin != null ? Number(data.durationMin) : null,
+        poopColor: POOP_COLORS[data.poopColor] ? data.poopColor : null,
+        note: String(data.note || ''),
+        createdAt: new Date().toISOString()
+      };
+
+      events.push(event);
+      persistEvents();
+      renderAll();
+      return event;
+    }
+
+    function deleteEvent(id) {
+      events = events.filter(function (event) {
+        return event.id !== id;
+      });
+
+      persistEvents();
+      renderAll();
+    }
+
+    function importEvents(imported) {
+      const map = new Map(events.map(function (event) {
+        return [event.id, event];
+      }));
+
+      let added = 0;
+
+      imported.forEach(function (raw) {
+        if (!raw || !TYPE_META[raw.type] || !raw.when) return;
+
+        const when = new Date(raw.when);
+        if (isNaN(when)) return;
+
+        const event = {
+          id: raw.id || uid(),
+          type: raw.type,
+          when: when.toISOString(),
+          side: SIDE_META[raw.side] ? raw.side : null,
+          durationMin: raw.durationMin != null ? Number(raw.durationMin) : null,
+          poopColor: POOP_COLORS[raw.poopColor] ? raw.poopColor : null,
+          note: String(raw.note || ''),
+          createdAt: raw.createdAt || new Date().toISOString()
+        };
+
+        if (!map.has(event.id)) added++;
+        map.set(event.id, event);
+      });
+
+      events = Array.from(map.values());
+      persistEvents();
+      renderAll();
+
+      return added;
+    }
+
+    function toast(message) {
+      const element = $('#toast');
+      element.textContent = message;
+      element.classList.add('show');
+
+      clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(function () {
+        element.classList.remove('show');
+      }, 2600);
+    }
+
+    function renderTopDate() {
+      const text = new Date().toLocaleDateString('it-IT', {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long'
+      });
+
+      $('#topDate').textContent = text.charAt(0).toUpperCase() + text.slice(1);
+    }
+
+    function renderSummary() {
+      const today = dayKey(new Date());
+
+      const todayEvents = events.filter(function (event) {
+        return dayKey(new Date(event.when)) === today;
+      });
+
+      const pees = todayEvents.filter(event => event.type === 'pipi');
+      const poops = todayEvents.filter(event => event.type === 'cacca');
+      const feeds = todayEvents.filter(event => event.type === 'poppata');
+
+      const feedMinutes = feeds.reduce(function (total, event) {
+        return total + (Number(event.durationMin) || 0);
+      }, 0);
+
+      $('#statPee').textContent = pees.length;
+      $('#statPoop').textContent = poops.length;
+      $('#statFeed').textContent = feeds.length;
+      $('#statFeedTime').textContent = fmtDuration(feedMinutes);
+
+      const sortedFeeds = events
+        .filter(event => event.type === 'poppata')
+        .sort((a, b) => new Date(b.when) - new Date(a.when));
+
+      const last = sortedFeeds[0];
+      const lastFeedLine = $('#lastFeedLine');
+
+      if (!last) {
+        lastFeedLine.textContent = 'Ultima poppata: —';
+        return;
+      }
+
+      const side = SIDE_META[last.side];
+      let text = 'Ultima poppata: ' + fmtTime(last.when);
+
+      if (side) text += ' · ' + side.short;
+      if (last.durationMin) text += ' · ' + fmtDuration(last.durationMin);
+
+      text += ' · ' + ago(last.when);
+
+      if (last.side === 'dx') {
+        text += ' · Suggerito: seno sinistro 👈';
+      } else if (last.side === 'sx') {
+        text += ' · Suggerito: seno destro 👉';
+      }
+
+      lastFeedLine.textContent = text;
+    }
+
+    function eventSubtitle(event) {
+      if (event.type === 'poppata') {
+        const parts = [];
+        const side = SIDE_META[event.side];
+
+        if (side) parts.push(side.emoji + ' ' + side.label);
+        if (event.durationMin) parts.push(fmtDuration(event.durationMin));
+        if (event.note) parts.push(event.note);
+
+        return parts.join(' · ') || 'Poppata registrata';
+      }
+
+      if (event.type === 'cacca') {
+        const parts = [];
+        const color = POOP_COLORS[event.poopColor];
+
+        if (color) parts.push(color.emoji + ' ' + color.label);
+        if (event.note) parts.push(event.note);
+
+        return parts.join(' · ') || 'Cacca registrata';
+      }
+
+      return event.note || 'Episodio registrato';
+    }
+
+    function eventItemHtml(event) {
+      const meta = TYPE_META[event.type] || { label: event.type, emoji: '📝' };
+
+      return '<div class="event">' +
+        '<div class="event-emoji">' + meta.emoji + '</div>' +
+        '<div class="event-body">' +
+          '<div class="event-title">' + esc(fmtTime(event.when)) + ' · ' + esc(meta.label) + '</div>' +
+          '<div class="event-sub">' + esc(eventSubtitle(event)) + '</div>' +
+        '</div>' +
+        '<button class="delete" type="button" data-delete="' + esc(event.id) + '" aria-label="Elimina evento">✕</button>' +
+      '</div>';
+    }
+
+    function groupedEventsHtml(list) {
+      let html = '';
+      let lastDay = null;
+
+      list.forEach(function (event) {
+        const day = dayKey(event.when);
+
+        if (day !== lastDay) {
+          html += '<div class="day">' + esc(fmtDayLabel(event.when)) + '</div>';
+          lastDay = day;
+        }
+
+        html += eventItemHtml(event);
+      });
+
+      return html;
+    }
+
+    function renderEvents() {
+      const container = $('#events');
+
+      const sorted = events.slice().sort(function (a, b) {
+        return new Date(b.when) - new Date(a.when);
+      });
+
+      const limited = sorted.slice(0, 80);
+
+      $('#eventCount').textContent = events.length
+        ? events.length + (events.length === 1 ? ' evento' : ' eventi')
+        : '';
+
+      if (!limited.length) {
+        container.innerHTML = '<div class="empty">👶 Nessun evento registrato.<br><small>Premi uno dei pulsanti qui sopra.</small></div>';
+        return;
+      }
+
+      container.innerHTML = groupedEventsHtml(limited);
+    }
+
+    function renderListModal() {
+      const container = $('#listEvents');
+
+      if (!currentListType) {
+        container.innerHTML = '';
+        return;
+      }
+
+      $('#listTitle').textContent = LIST_TITLES[currentListType] || 'Elenco';
+
+      const filtered = events
+        .filter(event => event.type === currentListType)
+        .sort((a, b) => new Date(b.when) - new Date(a.when));
+
+      if (!filtered.length) {
+        container.innerHTML = '<div class="empty">Nessun evento di questo tipo.</div>';
+        return;
+      }
+
+      container.innerHTML = groupedEventsHtml(filtered);
+    }
+
+    function openList(type) {
+      if (!TYPE_META[type]) return;
+
+      currentListType = type;
+      renderListModal();
+      openModal('#modalList');
+    }
+
+    function updateTimerClock() {
+      if (!feedTimer) return;
+
+      const diff = Math.max(0, Date.now() - feedTimer.startAt);
+      const totalSeconds = Math.floor(diff / 1000);
+
+      const hours = Math.floor(totalSeconds / 3600);
+      const minutes = Math.floor((totalSeconds % 3600) / 60);
+      const seconds = totalSeconds % 60;
+
+      $('#timerElapsed').textContent = hours > 0
+        ? pad(hours) + ':' + pad(minutes) + ':' + pad(seconds)
+        : pad(minutes) + ':' + pad(seconds);
+    }
+
+    function startClock() {
+      stopClock();
+      clockInterval = setInterval(updateTimerClock, 1000);
+    }
+
+    function stopClock() {
+      if (clockInterval) {
+        clearInterval(clockInterval);
+        clockInterval = null;
+      }
+    }
+
+    function elapsedMinutes() {
+      if (!feedTimer) return 0;
+      return Math.max(1, Math.round((Date.now() - feedTimer.startAt) / 60000));
+    }
+
+    function clearTimer() {
+      feedTimer = null;
+      timerEditMode = false;
+
+      try {
+        localStorage.removeItem(TIMER_KEY);
+      } catch (error) {
+        console.error(error);
+      }
+
+      renderTimer();
+    }
+
+    function renderTimer() {
+      const card = $('#timerCard');
+
+      if (!feedTimer) {
+        card.classList.add('hidden');
+        stopClock();
+        return;
+      }
+
+      card.classList.remove('hidden');
+
+      const side = SIDE_META[feedTimer.side];
+      $('#timerSide').textContent = side
+        ? side.emoji + ' ' + side.label
+        : 'Poppata';
+
+      $('#timerStarted').textContent = fmtTime(feedTimer.when || new Date(feedTimer.startAt).toISOString());
+
+      updateTimerClock();
+      startClock();
+    }
+
+    function renderAll() {
+      renderTopDate();
+      renderSummary();
+      renderEvents();
+      renderTimer();
+
+      const listModal = $('#modalList');
+      if (listModal && listModal.classList.contains('open') && currentListType) {
+        renderListModal();
+      }
+    }
+
+    function openModal(selector) {
+      const modal = $(selector);
+      if (!modal) return;
+
+      modal.classList.add('open');
+      document.body.classList.add('modal-open');
+    }
+
+    function closeModal(selectorOrElement) {
+      const modal = typeof selectorOrElement === 'string'
+        ? $(selectorOrElement)
+        : selectorOrElement;
+
+      if (!modal) return;
+
+      modal.classList.remove('open');
+
+      if (!document.querySelector('.modal.open')) {
+        document.body.classList.remove('modal-open');
+      }
+    }
+
+    function closeAllModals() {
+      $$('.modal.open').forEach(closeModal);
+    }
+
+    function openPee() {
+      $('#formPee').reset();
+      $('#peeWhen').value = toLocalInput();
+      openModal('#modalPee');
+    }
+
+    function openPoop() {
+      $('#formPoop').reset();
+      $('#poopWhen').value = toLocalInput();
+      openModal('#modalPoop');
+    }
+
+    function openFeed() {
+      $('#formFeed').reset();
+      timerEditMode = false;
+      $('#feedWhen').value = toLocalInput();
+      $('#feedDuration').value = '';
+      openModal('#modalFeed');
+    }
+
+    function getRadioValue(formSelector, name) {
+      const checked = $(formSelector + ' input[name="' + name + '"]:checked');
+      return checked ? checked.value : '';
+    }
+
+    function csvCell(value) {
+      const text = String(value ?? '');
+
+      return /[",\n\r]/.test(text)
+        ? '"' + text.replace(/"/g, '""') + '"'
+        : text;
+    }
+
+    function toCSV() {
+      const sorted = events.slice().sort(function (a, b) {
+        return new Date(a.when) - new Date(b.when);
+      });
+
+      const header = [
+        'id',
+        'data_ora',
+        'tipo',
+        'seno',
+        'durata_minuti',
+        'colore_cacca',
+        'note'
+      ];
+
+      const rows = sorted.map(function (event) {
+        return [
+          event.id || '',
+          formatDateTimePlain(event.when),
+          TYPE_META[event.type] ? TYPE_META[event.type].label : event.type,
+          SIDE_META[event.side] ? SIDE_META[event.side].label : '',
+          event.durationMin || '',
+          POOP_COLORS[event.poopColor] ? POOP_COLORS[event.poopColor].label : '',
+          event.note || ''
+        ];
+      });
+
+      return '\uFEFF' + [header].concat(rows)
+        .map(row => row.map(csvCell).join(','))
+        .join('\r\n');
+    }
+
+    function toJSON() {
+      const sorted = events.slice().sort(function (a, b) {
+        return new Date(a.when) - new Date(b.when);
+      });
+
+      return JSON.stringify({
+        app: 'Registro Neonato',
+        version: 1,
+        exportedAt: new Date().toISOString(),
+        count: sorted.length,
+        events: sorted
+      }, null, 2);
+    }
+
+    function downloadFile(filename, mime, text) {
+      const blob = new Blob([text], { type: mime });
+      const url = URL.createObjectURL(blob);
+
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      link.rel = 'noopener';
+      link.style.display = 'none';
+
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+
+      setTimeout(function () {
+        URL.revokeObjectURL(url);
+      }, 2000);
+    }
+
+    async function copyToClipboard(text) {
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          await navigator.clipboard.writeText(text);
+          toast('Dati copiati negli appunti 📋');
+          return true;
+        }
+      } catch (error) {
+        console.error(error);
+      }
+
+      return false;
+    }
+
+    async function nativeExportFile(filename, text) {
+      const plugins = window.Capacitor && window.Capacitor.Plugins;
+
+      if (!plugins || !plugins.Filesystem || !plugins.Share) {
+        throw new Error('Plugin Capacitor non disponibili');
+      }
+
+      const Filesystem = plugins.Filesystem;
+      const Share = plugins.Share;
+
+      if (typeof Filesystem.requestPermissions === 'function') {
+        try {
+          await Filesystem.requestPermissions();
+        } catch (error) {
+          console.warn(error);
+        }
+      }
+
+      try {
+        await Filesystem.deleteFile({
+          path: filename,
+          directory: 'DOCUMENTS'
+        });
+      } catch (error) {
+        // Il file potrebbe non esistere.
+      }
+
+      await Filesystem.writeFile({
+        path: filename,
+        data: text,
+        directory: 'DOCUMENTS',
+        encoding: 'utf8',
+        recursive: true
+      });
+
+      const uri = await Filesystem.getUri({
+        directory: 'DOCUMENTS',
+        path: filename
+      });
+
+      try {
+        await Share.share({
+          title: 'Registro Neonato',
+          url: uri.uri
+        });
+      } catch (error) {
+        const message = String((error && error.message) || error || '').toLowerCase();
+
+        if (message.includes('cancel')) {
+          const cancelError = new Error('cancelled');
+          cancelError.cancelled = true;
+          throw cancelError;
+        }
+
+        throw error;
+      }
+    }
+
+    async function exportFile(filename, mime, text) {
+      if (isNativePlatform()) {
+        try {
+          await nativeExportFile(filename, text);
+          return true;
+        } catch (error) {
+          if (error && error.cancelled) return false;
+
+          console.warn('Export nativo non riuscito, provo il fallback.', error);
+
+          const copied = await copyToClipboard(text);
+          if (copied) return true;
+        }
+      }
+
+      try {
+        if (typeof File !== 'undefined' && navigator.canShare) {
+          const file = new File([text], filename, { type: mime });
+
+          if (navigator.canShare({ files: [file] })) {
+            await navigator.share({
+              files: [file],
+              title: 'Registro Neonato'
+            });
+            return true;
+          }
+        }
+      } catch (error) {
+        if (error && error.name === 'AbortError') return false;
+        console.warn('Condivisione web non riuscita, uso il download.', error);
+      }
+
+      downloadFile(filename, mime, text);
+      return true;
+    }
+
+    function applyTheme(theme) {
+      document.documentElement.setAttribute('data-theme', theme);
+
+      try {
+        localStorage.setItem(THEME_KEY, theme);
+      } catch (error) {
+        console.error(error);
+      }
+
+      const button = $('#themeBtn');
+      if (button) button.textContent = theme === 'dark' ? '☀️' : '🌙';
+
+      const meta = document.querySelector('meta[name="theme-color"]');
+      if (meta) meta.setAttribute('content', theme === 'dark' ? '#141017' : '#fff7f2');
+    }
+
+    function initTheme() {
+      let saved = null;
+
+      try {
+        saved = localStorage.getItem(THEME_KEY);
+      } catch (error) {
+        console.error(error);
+      }
+
+      const prefersDark = window.matchMedia &&
+        window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+      applyTheme(saved === 'dark' || saved === 'light'
+        ? saved
+        : (prefersDark ? 'dark' : 'light'));
+    }
+
+    function onEventListClick(event) {
+      const button = event.target.closest('[data-delete]');
+      if (!button) return;
+
+      const id = button.getAttribute('data-delete');
+      if (confirm('Eliminare questo evento?')) deleteEvent(id);
+    }
+
+    function bindUi() {
+      $('#btnPee').addEventListener('click', openPee);
+      $('#btnPoop').addEventListener('click', openPoop);
+      $('#btnFeed').addEventListener('click', openFeed);
+
+      $('#btnExportAction').addEventListener('click', function () {
+        openModal('#modalExport');
+      });
+
+      $$('.stat[data-list]').forEach(function (button) {
+        button.addEventListener('click', function () {
+          openList(button.getAttribute('data-list'));
+        });
+      });
+
+      $$('.modal').forEach(function (modal) {
+        modal.addEventListener('click', function (event) {
+          if (event.target === modal) closeModal(modal);
+        });
+      });
+
+      $$('[data-close]').forEach(function (button) {
+        button.addEventListener('click', function () {
+          const modal = button.closest('.modal');
+          if (modal) closeModal(modal);
+        });
+      });
+
+      $('#events').addEventListener('click', onEventListClick);
+      $('#listEvents').addEventListener('click', onEventListClick);
+
+      $$('.chip-button[data-minutes]').forEach(function (button) {
+        button.addEventListener('click', function () {
+          $('#feedDuration').value = button.getAttribute('data-minutes');
+        });
+      });
+
+      $('#themeBtn').addEventListener('click', function () {
+        const current = document.documentElement.getAttribute('data-theme');
+        applyTheme(current === 'dark' ? 'light' : 'dark');
+      });
+
+      $('#formPee').addEventListener('submit', function (event) {
+        event.preventDefault();
+
+        const when = fromLocalInput($('#peeWhen').value);
+        if (isNaN(when)) {
+          toast('Orario non valido');
+          return;
+        }
+
+        addEvent({
+          type: 'pipi',
+          when: when.toISOString(),
+          note: $('#peeNote').value.trim()
+        });
+
+        closeModal('#modalPee');
+        toast('Pipì salvata 💧');
+      });
+
+      $('#formPoop').addEventListener('submit', function (event) {
+        event.preventDefault();
+
+        const when = fromLocalInput($('#poopWhen').value);
+        if (isNaN(when)) {
+          toast('Orario non valido');
+          return;
+        }
+
+        const color = getRadioValue('#formPoop', 'poopColor');
+        if (!color) {
+          toast('Scegli un colore');
+          return;
+        }
+
+        addEvent({
+          type: 'cacca',
+          when: when.toISOString(),
+          poopColor: color,
+          note: $('#poopNote').value.trim()
+        });
+
+        closeModal('#modalPoop');
+        toast('Cacca salvata 💩');
+      });
+
+      $('#formFeed').addEventListener('submit', function (event) {
+        event.preventDefault();
+
+        const side = getRadioValue('#formFeed', 'side');
+        if (!side) {
+          toast('Scegli seno destro, sinistro o entrambi');
+          return;
+        }
+
+        const durationValue = $('#feedDuration').value.trim();
+        const duration = parseInt(durationValue, 10);
+
+        if (!durationValue || isNaN(duration) || duration <= 0) {
+          toast('Inserisci la durata in minuti');
+          return;
+        }
+
+        const when = fromLocalInput($('#feedWhen').value);
+        if (isNaN(when)) {
+          toast('Orario non valido');
+          return;
+        }
+
+        addEvent({
+          type: 'poppata',
+          when: when.toISOString(),
+          side: side,
+          durationMin: duration,
+          note: $('#feedNote').value.trim()
+        });
+
+        if (timerEditMode) clearTimer();
+
+        closeModal('#modalFeed');
+        $('#formFeed').reset();
+        timerEditMode = false;
+
+        toast('Poppata salvata 🍼');
+      });
+
+      $('#btnStartTimer').addEventListener('click', function () {
+        const side = getRadioValue('#formFeed', 'side');
+
+        if (!side) {
+          toast('Scegli il seno prima di avviare il timer');
+          return;
+        }
+
+        if (feedTimer && !confirm('Timer già attivo. Vuoi sostituirlo?')) {
+          return;
+        }
+
+        const now = new Date();
+
+        feedTimer = {
+          side: side,
+          startAt: now.getTime(),
+          when: now.toISOString()
+        };
+
+        persistTimer();
+        timerEditMode = false;
+
+        closeModal('#modalFeed');
+        $('#formFeed').reset();
+        renderAll();
+
+        toast('Timer poppata avviato ⏱️');
+      });
+
+      $('#btnTimerSave').addEventListener('click', function () {
+        if (!feedTimer) return;
+
+        const minutes = elapsedMinutes();
+        const when = feedTimer.when || new Date(feedTimer.startAt).toISOString();
+
+        addEvent({
+          type: 'poppata',
+          when: when,
+          side: feedTimer.side,
+          durationMin: minutes,
+          note: ''
+        });
+
+        clearTimer();
+        toast('Poppata salvata: ' + fmtDuration(minutes) + ' 🍼');
+      });
+
+      $('#btnTimerEdit').addEventListener('click', function () {
+        if (!feedTimer) return;
+
+        $('#formFeed').reset();
+        timerEditMode = true;
+
+        $('#feedWhen').value = toLocalInput(new Date(feedTimer.when || feedTimer.startAt));
+        $('#feedDuration').value = elapsedMinutes();
+
+        const sideInput = $('#formFeed input[name="side"][value="' + feedTimer.side + '"]');
+        if (sideInput) sideInput.checked = true;
+
+        openModal('#modalFeed');
+      });
+
+      $('#btnTimerCancel').addEventListener('click', function () {
+        if (!feedTimer) return;
+
+        if (confirm('Annullare il timer in corso?')) {
+          clearTimer();
+          toast('Timer annullato');
+        }
+      });
+
+      $('#btnCsv').addEventListener('click', async function () {
+        if (!events.length) {
+          toast('Nessun dato da esportare');
+          return;
+        }
+
+        closeModal('#modalExport');
+
+        const done = await exportFile(
+          'registro-neonato-' + dateStamp() + '.csv',
+          'text/csv;charset=utf-8',
+          toCSV()
+        );
+
+        if (done) toast('CSV creato 📊');
+      });
+
+      $('#btnJson').addEventListener('click', async function () {
+        if (!events.length) {
+          toast('Nessun dato da esportare');
+          return;
+        }
+
+        closeModal('#modalExport');
+
+        const done = await exportFile(
+          'registro-neonato-backup-' + dateStamp() + '.json',
+          'application/json',
+          toJSON()
+        );
+
+        if (done) toast('Backup JSON creato 💾');
+      });
+
+      $('#importFile').addEventListener('change', async function (event) {
+        const file = event.target.files && event.target.files[0];
+        if (!file) return;
+
+        try {
+          const text = await file.text();
+          const data = JSON.parse(text);
+
+          const imported = Array.isArray(data)
+            ? data
+            : (Array.isArray(data.events) ? data.events : null);
+
+          if (!imported) throw new Error('Formato JSON non riconosciuto');
+
+          const added = importEvents(imported);
+
+          closeModal('#modalExport');
+          toast(added
+            ? added + ' nuovi eventi importati 💾'
+            : 'Nessun nuovo evento trovato');
+        } catch (error) {
+          console.error(error);
+          toast('File JSON non valido');
+        } finally {
+          event.target.value = '';
+        }
+      });
+    }
+
+    events = loadEvents();
+    feedTimer = loadTimer();
+
+    initTheme();
+    bindUi();
+    renderAll();
+
+    if (!storageOk) {
+      $('#storageWarning').classList.remove('hidden');
+    }
+
+    document.addEventListener('keydown', function (event) {
+      if (event.key === 'Escape') closeAllModals();
+    });
+
+    document.addEventListener('visibilitychange', function () {
+      if (document.hidden) {
+        stopClock();
+      } else {
+        renderTopDate();
+        renderSummary();
+        renderTimer();
+      }
+    });
+
+    setInterval(function () {
+      if (!document.hidden) {
+        renderTopDate();
+        renderSummary();
+      }
+    }, 60000);
+  </script>
+</body>
+</html>
