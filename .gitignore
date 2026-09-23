@@ -2,3 +2,5 @@ node_modules/
 android/
 .DS_Store
 *.log
+*.keystore
+*.b64
