@@ -34,11 +34,12 @@ jobs:
           rm -rf node_modules package-lock.json
           npm install --no-audit --no-fund
 
-      - name: Add Android platform
-        run: npx cap add android
-
-      - name: Capacitor sync
-        run: npx cap sync android
+      - name: Ensure Android platform and sync
+        run: |
+          if [ ! -d android ]; then
+            npx cap add android
+          fi
+          npx cap sync android
 
       - name: Make gradlew executable
         run: chmod +x android/gradlew
