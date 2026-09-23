@@ -48,8 +48,42 @@ jobs:
             cp -rf icon-assets/. android/app/src/main/res/
           fi
 
-      - name: Set versionCode from GitHub run number
-        run: sed -i -E "s/versionCode [0-9]+/versionCode ${{ github.run_number }}/" android/app/build.gradle
+      - name: Set versionCode and versionName
+        run: |
+          sed -i -E "s/versionCode [0-9]+/versionCode ${{ github.run_number }}/" android/app/build.gradle
+          sed -i -E "s/versionName \"[^\"]*\"/versionName \"1.0.${{ github.run_number }}\"/" android/app/build.gradle
+
+      - name: Setup stable signing
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+        run: |
+          if [ -n "$KEYSTORE_BASE64" ]; then
+            echo "$KEYSTORE_BASE64" | base64 -d > "$GITHUB_WORKSPACE/registro-neonato.keystore"
+            echo "KEYSTORE_PATH=$GITHUB_WORKSPACE/registro-neonato.keystore" >> "$GITHUB_ENV"
+            cat >> android/app/build.gradle <<'EOF'
+
+          android {
+              signingConfigs {
+                  stable {
+                      storeFile file(System.getenv("KEYSTORE_PATH"))
+                      storePassword System.getenv("KEYSTORE_PASSWORD")
+                      keyAlias System.getenv("KEY_ALIAS")
+                      keyPassword System.getenv("KEYSTORE_PASSWORD")
+                  }
+              }
+              buildTypes {
+                  debug {
+                      signingConfig signingConfigs.stable
+                  }
+              }
+          }
+          EOF
+            echo "Firma stabile attiva."
+          else
+            echo "Nessun keystore nei segreti: uso la firma debug temporanea."
+          fi
 
       - name: Make gradlew executable
         run: chmod +x android/gradlew
@@ -59,23 +93,34 @@ jobs:
           yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
 
       - name: Build debug APK
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
         run: |
           cd android
           ./gradlew assembleDebug --no-daemon
 
       - name: Rename APK
-        run: mv android/app/build/outputs/apk/debug/app-debug.apk registro-neonato-debug.apk
+        run: mv android/app/build/outputs/apk/debug/app-debug.apk registro-neonato.apk
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: registro-neonato-debug-apk
-          path: registro-neonato-debug.apk
+          name: registro-neonato-apk
+          path: registro-neonato.apk
 
       - name: Release APK
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: latest
-          name: Ultima APK debug
+          tag_name: v1.0.${{ github.run_number }}
+          name: Registro Neonato 🍼 v1.0.${{ github.run_number }}
+          body: |
+            ## Come si installa
+            1. Scarica il file `registro-neonato.apk` qui sotto.
+            2. Sul telefono consenti l'installazione da questa fonte.
+            3. Apri l'app e inizia a registrare.
+
+            ## Aggiornamenti automatici
+            Con [Obtainium](https://github.com/ImranR98/Obtainium) l'app si aggiorna con un tocco.
           make_latest: true
-          files: registro-neonato-debug.apk
+          files: registro-neonato.apk
