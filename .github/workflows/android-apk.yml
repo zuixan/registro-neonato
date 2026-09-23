@@ -11,7 +11,8 @@ permissions:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    # Usiamo ubuntu-22.04 che è super stabile per Android ed evita i warning di aggiornamento
+    runs-on: ubuntu-22.04
 
     steps:
       - name: Checkout
@@ -28,32 +29,23 @@ jobs:
           distribution: temurin
           java-version: 17
 
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-
       - name: Install dependencies
         run: |
-          if [ -f package-lock.json ]; then
-            npm ci
-          else
-            npm install --no-audit --no-fund
-          fi
+          rm -rf node_modules package-lock.json
+          npm install --no-audit --no-fund
 
-      - name: Add Android platform if missing
-        run: |
-          if [ ! -d android ]; then
-            npx cap add android
-          fi
+      - name: Add Android platform
+        run: npx cap add android
 
       - name: Capacitor sync
         run: npx cap sync android
 
-      - name: Set versionCode from GitHub run number
-        run: |
-          sed -i -E "s/versionCode [0-9]+/versionCode ${{ github.run_number }}/" android/app/build.gradle
-
       - name: Make gradlew executable
         run: chmod +x android/gradlew
+
+      - name: Accept Android Licenses
+        run: |
+          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
 
       - name: Build debug APK
         run: |
