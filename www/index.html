@@ -115,8 +115,10 @@
     .timer strong { display: block; font-size: 17px; letter-spacing: -.03em; }
     .timer .muted { font-size: 12px; }
     .timer-time { font-size: 30px; font-weight: 900; letter-spacing: -.06em; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .timer.paused .timer-time { opacity: .55; }
     .timer .btn { min-height: 48px; padding: 12px 14px; font-size: 15px; border-radius: 16px; }
-    .timer .btn-wide { min-height: 44px; padding: 10px 14px; font-size: 14px; }
+    .timer .btn-row { margin-top: 10px; }
+    .timer .btn-row.tight { margin-top: 8px; }
 
     .actions-main { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
 
@@ -417,7 +419,7 @@
         <button id="btnNotifPerm" class="btn btn-ghost" type="button">🔔 Permessi notifiche</button>
         <button id="btnSaveSettings" class="btn btn-primary" type="button">Salva</button>
       </div>
-      <span class="hint">Promemoria e backup automatico funzionano nell'APK. Il backup si chiama registro-neonato-autobackup.json nella cartella Documenti.</span>
+      <span class="hint">Promemoria, notifiche timer e backup automatico funzionano nell'APK. Il backup si chiama registro-neonato-autobackup.json nella cartella Documenti.</span>
     </div>
   </div>
 
@@ -606,6 +608,13 @@
       } catch (error) { console.error(error); toast('Salvataggio non riuscito'); }
     }
 
+    function migrateTimer(t) {
+      if (!t || !t.startAt) return null;
+      if (t.accumulatedMs == null) t.accumulatedMs = 0;
+      if (t.runningSince === undefined) t.runningSince = t.startAt;
+      return t;
+    }
+
     function loadTimers() {
       if (!storageOk) return {};
       try {
@@ -613,10 +622,13 @@
         if (!raw) return {};
         const parsed = JSON.parse(raw);
         if (!parsed) return {};
-        if (parsed.startAt && SIDE_META[parsed.side]) return { poppata: parsed };
+        if (parsed.startAt && SIDE_META[parsed.side]) {
+          const legacy = migrateTimer(parsed);
+          return legacy ? { poppata: legacy } : {};
+        }
         const out = {};
-        if (parsed.poppata && parsed.poppata.startAt) out.poppata = parsed.poppata;
-        if (parsed.sonno && parsed.sonno.startAt) out.sonno = parsed.sonno;
+        if (parsed.poppata && parsed.poppata.startAt) out.poppata = migrateTimer(parsed.poppata);
+        if (parsed.sonno && parsed.sonno.startAt) out.sonno = migrateTimer(parsed.sonno);
         return out;
       } catch (error) { return {}; }
     }
@@ -627,6 +639,21 @@
         if (Object.keys(timers).length) localStorage.setItem(TIMER_KEY, JSON.stringify(timers));
         else localStorage.removeItem(TIMER_KEY);
       } catch (error) { console.error(error); }
+    }
+
+    function elapsedMs(t) {
+      if (!t) return 0;
+      const acc = Number(t.accumulatedMs) || 0;
+      if (t.runningSince == null) return acc;
+      return acc + Math.max(0, Date.now() - t.runningSince);
+    }
+
+    function timerMinutes(t) {
+      return Math.max(1, Math.round(elapsedMs(t) / 60000));
+    }
+
+    function isPaused(t) {
+      return !!t && t.runningSince == null;
     }
 
     function addEvent(data) {
@@ -803,9 +830,8 @@
       openModal('#modalList');
     }
 
-    function clockText(startAt) {
-      const diff = Math.max(0, Date.now() - startAt);
-      const total = Math.floor(diff / 1000);
+    function clockTextMs(ms) {
+      const total = Math.max(0, Math.floor(ms / 1000));
       const h = Math.floor(total / 3600);
       const m = Math.floor((total % 3600) / 60);
       const s = total % 60;
@@ -815,7 +841,7 @@
     function updateTimerClocks() {
       ['poppata', 'sonno'].forEach(function (type) {
         const el = document.querySelector('[data-clock="' + type + '"]');
-        if (el && timers[type]) el.textContent = clockText(timers[type].startAt);
+        if (el && timers[type]) el.textContent = clockTextMs(elapsedMs(timers[type]));
       });
     }
 
@@ -835,17 +861,26 @@
 
       box.innerHTML = active.map(function (type) {
         const t = timers[type];
+        const paused = isPaused(t);
         const title = type === 'poppata' ? '🤱 Poppata in corso' : '😴 Nanna in corso';
-        const side = type === 'poppata' && SIDE_META[t.side] ? '<div class="muted">' + SIDE_META[t.side].emoji + ' ' + SIDE_META[t.side].label + '</div>' : '';
-        return '<section class="timer">' +
-          '<div class="timer-top"><div><strong>' + title + '</strong>' + side +
-            '<div class="muted">Iniziata alle ' + esc(fmtTime(t.when || new Date(t.startAt).toISOString())) + '</div></div>' +
-            '<div class="timer-time" data-clock="' + type + '">00:00</div></div>' +
+        const side = type === 'poppata' && SIDE_META[t.side]
+          ? '<div class="muted">' + SIDE_META[t.side].emoji + ' ' + SIDE_META[t.side].label + '</div>'
+          : '';
+        const stateLine = paused
+          ? '<div class="muted">⏸️ In pausa · accumulati ' + fmtDuration(timerMinutes(t)) + '</div>'
+          : '<div class="muted">Iniziata alle ' + esc(fmtTime(t.when || new Date(t.startAt).toISOString())) + '</div>';
+
+        return '<section class="timer' + (paused ? ' paused' : '') + '">' +
+          '<div class="timer-top"><div><strong>' + title + '</strong>' + side + stateLine + '</div>' +
+          '<div class="timer-time" data-clock="' + type + '">00:00</div></div>' +
           '<div class="btn-row">' +
-            '<button class="btn btn-ghost" type="button" data-timer-action="edit" data-type="' + type + '">✏️ Modifica</button>' +
+            '<button class="btn btn-ghost" type="button" data-timer-action="togglepause" data-type="' + type + '">' + (paused ? '▶️ Riprendi' : '⏸️ Pausa') + '</button>' +
             '<button class="btn btn-primary" type="button" data-timer-action="save" data-type="' + type + '">✅ Salva</button>' +
           '</div>' +
-          '<button class="btn btn-danger btn-wide mt" type="button" data-timer-action="cancel" data-type="' + type + '">Annulla timer</button>' +
+          '<div class="btn-row tight">' +
+            '<button class="btn btn-ghost" type="button" data-timer-action="edit" data-type="' + type + '">✏️ Modifica</button>' +
+            '<button class="btn btn-danger" type="button" data-timer-action="cancel" data-type="' + type + '">🗑️ Annulla</button>' +
+          '</div>' +
         '</section>';
       }).join('');
 
@@ -999,20 +1034,75 @@
 
     const REMIND_ID = 1001;
 
+    function timerNotifyId(type) {
+      return type === 'poppata' ? 2001 : 2002;
+    }
+
+    function getLN() {
+      return window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.LocalNotifications;
+    }
+
     async function initNotifications() {
       if (!isNativePlatform()) return;
-      const LN = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.LocalNotifications;
+      const LN = getLN();
       if (!LN) return;
       try {
         if (LN.createChannel) {
           await LN.createChannel({ id: 'promemoria', name: 'Promemoria', description: 'Avvisi poppate', importance: 3, visibility: 1 });
+          await LN.createChannel({ id: 'timer', name: 'Timer in corso', description: 'Notifica persistente dei timer', importance: 2, visibility: 1 });
         }
       } catch (error) { console.warn(error); }
     }
 
+    async function updateTimerNotification(type) {
+      if (!isNativePlatform()) return;
+      const LN = getLN();
+      if (!LN) return;
+      const id = timerNotifyId(type);
+      try { await LN.cancel({ notifications: [{ id: id }] }); } catch (error) {}
+
+      const t = timers[type];
+      if (!t) return;
+
+      const start = fmtTime(t.when || new Date(t.startAt).toISOString());
+      let title, body;
+
+      if (isPaused(t)) {
+        title = (type === 'poppata' ? '🤱 Poppata' : '😴 Nanna') + ' ⏸️ in pausa';
+        body = 'Accumulati ' + fmtDuration(timerMinutes(t)) + ' · dalle ' + start;
+      } else {
+        title = type === 'poppata' ? '🤱 Poppata in corso' : '😴 Nanna in corso';
+        body = 'Dalle ' + start + (type === 'poppata' && SIDE_META[t.side] ? ' · ' + SIDE_META[t.side].label : '');
+      }
+
+      try {
+        await LN.schedule({
+          notifications: [{
+            id: id,
+            title: title,
+            body: body,
+            channelId: 'timer',
+            ongoing: true,
+            schedule: { at: new Date(Date.now() + 300) }
+          }]
+        });
+      } catch (error) { console.warn('Notifica timer non pianificata.', error); }
+    }
+
+    async function clearTimerNotification(type) {
+      if (!isNativePlatform()) return;
+      const LN = getLN();
+      if (!LN) return;
+      try { await LN.cancel({ notifications: [{ id: timerNotifyId(type) }] }); } catch (error) {}
+    }
+
+    function syncTimerNotifications() {
+      ['poppata', 'sonno'].forEach(function (type) { updateTimerNotification(type); });
+    }
+
     async function rescheduleReminder() {
       if (!isNativePlatform()) return;
-      const LN = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.LocalNotifications;
+      const LN = getLN();
       if (!LN) return;
       const hours = Number(settings.remindHours) || 0;
       try { await LN.cancel({ notifications: [{ id: REMIND_ID }] }); } catch (error) {}
@@ -1057,15 +1147,32 @@
       if (confirm('Eliminare questo evento?')) deleteEvent(id);
     }
 
+    function togglePause(type) {
+      const t = timers[type];
+      if (!t) return;
+      if (isPaused(t)) {
+        t.runningSince = Date.now();
+        toast('Timer ripreso ▶️');
+      } else {
+        t.accumulatedMs = elapsedMs(t);
+        t.runningSince = null;
+        toast('Timer in pausa ⏸️');
+      }
+      persistTimers();
+      renderAll();
+      updateTimerNotification(type);
+    }
+
     function saveTimer(type) {
       const t = timers[type];
       if (!t) return;
-      const minutes = Math.max(1, Math.round((Date.now() - t.startAt) / 60000));
+      const minutes = timerMinutes(t);
       const when = t.when || new Date(t.startAt).toISOString();
       if (type === 'poppata') addEvent({ type: 'poppata', when: when, side: t.side, durationMin: minutes, note: '' });
       else addEvent({ type: 'sonno', when: when, durationMin: minutes, note: '' });
       delete timers[type];
       persistTimers();
+      clearTimerNotification(type);
       toast(type === 'poppata' ? 'Poppata salvata: ' + fmtDuration(minutes) + ' 🍼' : 'Nanna salvata: ' + fmtDuration(minutes) + ' 😴');
     }
 
@@ -1073,7 +1180,7 @@
       const t = timers[type];
       if (!t) return;
       timerEditType = type;
-      const minutes = Math.max(1, Math.round((Date.now() - t.startAt) / 60000));
+      const minutes = timerMinutes(t);
       if (type === 'poppata') {
         $('#formFeed').reset();
         $('#feedWhen').value = toLocalInput(new Date(t.when || t.startAt));
@@ -1125,10 +1232,12 @@
         const action = button.getAttribute('data-timer-action');
         if (action === 'save') saveTimer(type);
         else if (action === 'edit') editTimer(type);
+        else if (action === 'togglepause') togglePause(type);
         else if (action === 'cancel') {
           if (confirm('Annullare il timer in corso?')) {
             delete timers[type];
             persistTimers();
+            clearTimerNotification(type);
             renderAll();
             toast('Timer annullato');
           }
@@ -1175,7 +1284,7 @@
         if (!durationValue || isNaN(duration) || duration <= 0) { toast('Inserisci la durata in minuti'); return; }
         const when = fromLocalInput($('#feedWhen').value);
         addEvent({ type: 'poppata', when: when.toISOString(), side: side, durationMin: duration, note: $('#feedNote').value.trim() });
-        if (timerEditType === 'poppata') { delete timers.poppata; persistTimers(); }
+        if (timerEditType === 'poppata') { delete timers.poppata; persistTimers(); clearTimerNotification('poppata'); }
         timerEditType = null;
         closeModal('#modalFeed');
         toast('Poppata salvata 🍼');
@@ -1188,7 +1297,7 @@
         if (!durationValue || isNaN(duration) || duration <= 0) { toast('Inserisci la durata in minuti'); return; }
         const when = fromLocalInput($('#sonnoWhen').value);
         addEvent({ type: 'sonno', when: when.toISOString(), durationMin: duration, note: $('#sonnoNote').value.trim() });
-        if (timerEditType === 'sonno') { delete timers.sonno; persistTimers(); }
+        if (timerEditType === 'sonno') { delete timers.sonno; persistTimers(); clearTimerNotification('sonno'); }
         timerEditType = null;
         closeModal('#modalSonno');
         toast('Nanna salvata 😴');
@@ -1198,21 +1307,23 @@
         const side = getRadioValue('#formFeed', 'side');
         if (!side) { toast('Scegli il seno prima di avviare il timer'); return; }
         if (timers.poppata && !confirm('Timer poppata già attivo. Vuoi sostituirlo?')) return;
-        timers.poppata = { side: side, startAt: Date.now(), when: new Date().toISOString() };
+        timers.poppata = { side: side, startAt: Date.now(), when: new Date().toISOString(), accumulatedMs: 0, runningSince: Date.now() };
         persistTimers();
         timerEditType = null;
         closeModal('#modalFeed');
         renderAll();
+        updateTimerNotification('poppata');
         toast('Timer poppata avviato ⏱️');
       });
 
       $('#btnStartSonnoTimer').addEventListener('click', function () {
         if (timers.sonno && !confirm('Timer nanna già attivo. Vuoi sostituirlo?')) return;
-        timers.sonno = { startAt: Date.now(), when: new Date().toISOString() };
+        timers.sonno = { startAt: Date.now(), when: new Date().toISOString(), accumulatedMs: 0, runningSince: Date.now() };
         persistTimers();
         timerEditType = null;
         closeModal('#modalSonno');
         renderAll();
+        updateTimerNotification('sonno');
         toast('Timer nanna avviato 😴');
       });
 
@@ -1264,7 +1375,7 @@
 
       $('#btnNotifPerm').addEventListener('click', async function () {
         if (!isNativePlatform()) { toast('Disponibile solo nell\'APK'); return; }
-        const LN = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.LocalNotifications;
+        const LN = getLN();
         if (!LN) { toast('Plugin non disponibile'); return; }
         try {
           const res = await LN.requestPermissions();
@@ -1279,7 +1390,7 @@
     initTheme();
     bindUi();
     renderAll();
-    initNotifications();
+    initNotifications().then(syncTimerNotifications);
 
     if (!storageOk) $('#storageWarning').classList.remove('hidden');
 
@@ -1287,7 +1398,13 @@
 
     document.addEventListener('visibilitychange', function () {
       if (document.hidden) stopClock();
-      else { renderTopDate(); renderSummary(); renderTimers(); rescheduleReminder(); }
+      else {
+        renderTopDate();
+        renderSummary();
+        renderTimers();
+        rescheduleReminder();
+        syncTimerNotifications();
+      }
     });
 
     setInterval(function () {
