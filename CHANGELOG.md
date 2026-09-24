@@ -4,6 +4,8 @@ _Generato automaticamente dai commit su `main`: ogni push aggiorna questo file._
 
 Per l'APK di ogni versione vedi [Releases](../../releases).
 
+- **2026-09-24** — UX: contatori con etichette neutre e filtro predefinito su Oggi
+- **2026-09-24** — chore: aggiorna CHANGELOG [skip ci]
 - **2026-09-24** — Fix: riscrivo changelog.yml pulito, il precedente era duplicato
 - **2026-09-24** — UX: contatori dinamici per filtro + elenco con paginazione (20 alla volta)
 - **2026-09-24** — Fix: aggiorno permessi workflow changelog
