@@ -502,6 +502,7 @@
     let backupTimeout = null;
     let filterMode = 'all';
     let filterDay = '';
+    let eventsLimit = 20;
     let settings = loadSettings();
 
     const TYPE_META = {
@@ -817,14 +818,27 @@
       $('#topDate').textContent = text.charAt(0).toUpperCase() + text.slice(1);
     }
 
-    function renderSummary() {
-      const today = dayKey(new Date());
-      const todayEvents = events.filter(function (event) { return dayKey(new Date(event.when)) === today; });
+    function filterEvents(list) {
+      return list.filter(matchesFilter);
+    }
 
-      const pees = todayEvents.filter(e => e.type === 'pipi');
-      const poops = todayEvents.filter(e => e.type === 'cacca');
-      const feeds = todayEvents.filter(e => e.type === 'poppata');
-      const naps = todayEvents.filter(e => e.type === 'sonno');
+    function countLabel(base) {
+      if (filterMode === 'all' || filterMode === 'today') return base + ' oggi';
+      if (filterMode === 'yesterday') return base + ' · ieri';
+      if (filterMode === 'day' && filterDay) {
+        const d = new Date(filterDay + 'T12:00');
+        return base + ' · ' + d.getDate() + ' ' + d.toLocaleDateString('it-IT', { month: 'short' });
+      }
+      return base + ' oggi';
+    }
+
+    function renderSummary() {
+      const targetEvents = filterEvents(events);
+
+      const pees = targetEvents.filter(e => e.type === 'pipi');
+      const poops = targetEvents.filter(e => e.type === 'cacca');
+      const feeds = targetEvents.filter(e => e.type === 'poppata');
+      const naps = targetEvents.filter(e => e.type === 'sonno');
 
       const feedMinutes = feeds.reduce((s, e) => s + (Number(e.durationMin) || 0), 0);
       const sleepMinutes = naps.reduce((s, e) => s + (Number(e.durationMin) || 0), 0);
@@ -835,6 +849,19 @@
       $('#statFeedTime').textContent = fmtDuration(feedMinutes);
       $('#statNap').textContent = naps.length;
       $('#statSleep').textContent = fmtDuration(sleepMinutes);
+
+      // Etichette dinamiche
+      const labels = [
+        ['pipi', 'Pipì'],
+        ['cacca', 'Cacca'],
+        ['poppata', 'Poppate'],
+        ['poppata_time', 'Latte'],
+        ['sonno', 'Nanne'],
+        ['sonno_time', 'Sonno']
+      ];
+      const smalls = document.querySelectorAll('.stat small');
+      const baseLabels = ['Pipì', 'Cacca', 'Poppate', 'Latte', 'Nanne', 'Sonno'];
+      smalls.forEach(function (el, i) { el.textContent = countLabel(baseLabels[i]); });
 
       const last = lastFeeding();
       const line = $('#lastFeedLine');
@@ -928,9 +955,11 @@
       const container = $('#events');
       const sorted = events.slice().sort(function (a, b) { return new Date(b.when) - new Date(a.when); });
       const filtered = sorted.filter(matchesFilter);
-      const limited = filtered.slice(0, 200);
+      const limited = filtered.slice(0, eventsLimit);
 
-      $('#eventCount').textContent = filtered.length ? filtered.length + (filtered.length === 1 ? ' evento' : ' eventi') : '';
+      $('#eventCount').textContent = filtered.length
+        ? filtered.length + (filtered.length === 1 ? ' evento' : ' eventi')
+        : '';
 
       if (filterMode === 'today') $('#eventsTitle').textContent = 'Eventi di oggi';
       else if (filterMode === 'yesterday') $('#eventsTitle').textContent = 'Eventi di ieri';
@@ -945,7 +974,17 @@
           : '<div class="empty">👶 Nessun evento registrato.<br><small>Premi uno dei pulsanti qui sopra.</small></div>';
         return;
       }
-      container.innerHTML = groupedEventsHtml(limited);
+
+      let html = groupedEventsHtml(limited);
+
+      if (filtered.length > eventsLimit) {
+        const remaining = filtered.length - eventsLimit;
+        html += '<button id="btnLoadMore" class="btn btn-ghost btn-wide mt" type="button">📜 Mostra altri (' + remaining + ' rimasti)</button>';
+      } else if (filtered.length > 20) {
+        html += '<div class="muted" style="text-align:center; padding:12px 0; font-size:13px;">✓ Tutti gli eventi del periodo sono visibili</div>';
+      }
+
+      container.innerHTML = html;
     }
 
     function renderListModal() {
@@ -1450,13 +1489,16 @@
         button.addEventListener('click', function () { openList(button.getAttribute('data-list')); });
       });
 
+      function resetEventsLimit() { eventsLimit = 20; }
+
       $$('#filterChips [data-filter]').forEach(function (button) {
         button.addEventListener('click', function () {
           filterMode = button.getAttribute('data-filter');
           filterDay = '';
           $('#filterDate').value = '';
+          resetEventsLimit();
           updateFilterChips();
-          renderEvents();
+          renderAll();
         });
       });
 
@@ -1464,8 +1506,19 @@
         const v = $('#filterDate').value;
         if (v) { filterMode = 'day'; filterDay = v; }
         else { filterMode = 'all'; filterDay = ''; }
+        resetEventsLimit();
         updateFilterChips();
-        renderEvents();
+        renderAll();
+      });
+
+      $('#events').addEventListener('click', function (event) {
+        const more = event.target.closest('#btnLoadMore');
+        if (more) {
+          eventsLimit += 20;
+          renderEvents();
+          return;
+        }
+        onEventListClick(event);
       });
 
       $$('.modal').forEach(function (modal) {
@@ -1476,7 +1529,6 @@
         button.addEventListener('click', function () { const modal = button.closest('.modal'); if (modal) closeModal(modal); });
       });
 
-      $('#events').addEventListener('click', onEventListClick);
       $('#listEvents').addEventListener('click', onEventListClick);
 
       $('#timersBox').addEventListener('click', function (event) {
