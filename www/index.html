@@ -18,7 +18,7 @@
       --text: #3b2b35;
       --muted: #8d7886;
       --line: rgba(59, 43, 53, .10);
-      --shadow: 0 12px 30px rgba(101, 61, 80, .10);
+      --shadow: 0 8px 20px rgba(101, 61, 80, .08);
       --accent: #ff7fa5;
       --accent-soft: #ffe8ef;
       --blue: #d9efff;
@@ -37,7 +37,7 @@
       --text: #f9f2f6;
       --muted: #b6a4b1;
       --line: rgba(255, 255, 255, .10);
-      --shadow: 0 14px 34px rgba(0, 0, 0, .35);
+      --shadow: 0 10px 24px rgba(0, 0, 0, .30);
       --accent: #ff87ab;
       --accent-soft: #3a2430;
       --blue: #203446;
@@ -60,7 +60,8 @@
       color: var(--text);
       -webkit-font-smoothing: antialiased;
       touch-action: manipulation;
-      min-height: 100dvh;
+      height: 100dvh;
+      overflow: hidden;
     }
 
     button, input, textarea { font: inherit; color: inherit; }
@@ -73,113 +74,136 @@
     .mt { margin-top: 10px; }
 
     .topbar {
-      position: sticky; top: 0; z-index: 20;
-      display: flex; align-items: center; justify-content: space-between; gap: 12px;
-      padding: calc(env(safe-area-inset-top) + 14px) 16px 12px;
-      background: color-mix(in srgb, var(--bg) 86%, transparent);
+      display: flex; align-items: center; justify-content: space-between; gap: 10px;
+      padding: calc(env(safe-area-inset-top) + 8px) 12px 8px;
       border-bottom: 1px solid var(--line);
     }
-    .topbar h1 { margin: 0; font-size: 22px; line-height: 1.1; letter-spacing: -.03em; }
-    .topbar p { margin: 4px 0 0; color: var(--muted); font-size: 13px; font-weight: 600; }
-    .topbar-btns { display: flex; gap: 8px; flex: 0 0 auto; }
+    .topbar h1 { margin: 0; font-size: 17px; line-height: 1.1; letter-spacing: -.03em; }
+    .topbar p { margin: 2px 0 0; color: var(--muted); font-size: 11px; font-weight: 600; }
+    .topbar-btns { display: flex; gap: 6px; flex: 0 0 auto; }
 
     .icon-btn {
-      width: 42px; height: 42px; border-radius: 14px;
+      width: 36px; height: 36px; border-radius: 12px;
       border: 1px solid var(--line); background: var(--card);
-      display: grid; place-items: center; font-size: 18px;
+      display: grid; place-items: center; font-size: 15px;
       cursor: pointer; box-shadow: var(--shadow); flex: 0 0 auto;
     }
 
     main {
-      max-width: 680px; margin: 0 auto;
-      padding: 16px 16px calc(28px + env(safe-area-inset-bottom));
-      display: grid; gap: 14px;
+      width: 100%; max-width: 680px; margin: 0 auto;
+      height: calc(100dvh - 53px - env(safe-area-inset-top));
+      padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
+      display: flex; flex-direction: column; gap: 8px;
+      overflow: hidden;
     }
 
     .warning {
-      padding: 13px 14px; border-radius: 18px;
+      padding: 10px 12px; border-radius: 14px;
       background: rgba(255, 180, 80, .16);
       border: 1px solid rgba(255, 160, 60, .28);
-      font-size: 14px; line-height: 1.45;
+      font-size: 13px; line-height: 1.4;
     }
 
     .panel, .stat, .action, .timer { border: 1px solid var(--line); box-shadow: var(--shadow); }
 
-    #timersBox { display: grid; gap: 10px; }
+    #timersBox { display: grid; gap: 8px; }
 
     .timer {
-      border-radius: 26px; padding: 16px;
+      border-radius: 18px; padding: 10px 12px;
       background: linear-gradient(135deg, var(--accent-soft), var(--card));
     }
-    .timer-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
-    .timer strong { display: block; font-size: 18px; letter-spacing: -.03em; }
-    .timer-time { font-size: 34px; font-weight: 900; letter-spacing: -.06em; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .timer-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 8px; }
+    .timer strong { display: block; font-size: 14px; letter-spacing: -.02em; }
+    .timer .muted { font-size: 11px; }
+    .timer-time { font-size: 24px; font-weight: 900; letter-spacing: -.05em; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .timer .btn { min-height: 42px; padding: 10px 12px; font-size: 14px; border-radius: 14px; }
+    .timer .btn-wide { min-height: 38px; padding: 8px 12px; font-size: 13px; }
 
-    .actions-main { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+    .actions-main { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
 
     .action {
       display: flex; flex-direction: column; align-items: center; justify-content: center;
-      gap: 8px; min-height: 94px; padding: 14px 10px; border-radius: 24px;
+      gap: 5px; padding: 9px 4px; border-radius: 18px;
       background: var(--card); cursor: pointer; text-align: center; transition: transform .12s ease;
     }
-    .action:active { transform: scale(.975); }
+    .action:active { transform: scale(.96); }
     .action .big {
-      width: 50px; height: 50px; border-radius: 18px;
-      display: grid; place-items: center; font-size: 28px;
+      width: 38px; height: 38px; border-radius: 12px;
+      display: grid; place-items: center; font-size: 20px;
       background: var(--bg-soft); flex: 0 0 auto;
     }
     .action.blue .big { background: var(--blue); }
     .action.brown .big { background: var(--brown); }
     .action.pink .big { background: var(--pink); }
     .action.violet .big { background: var(--violet); }
-    .action .label { display: block; font-size: 15px; font-weight: 900; line-height: 1.15; letter-spacing: -.02em; min-width: 0; }
+    .action .label { display: block; font-size: 11px; font-weight: 900; line-height: 1.1; letter-spacing: -.01em; min-width: 0; }
 
-    .stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+    .stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
     .stat {
-      background: var(--card); border-radius: 22px; padding: 14px;
+      background: var(--card); border-radius: 16px; padding: 8px 10px;
       width: 100%; text-align: left; cursor: pointer; transition: transform .12s ease;
     }
-    .stat:active { transform: scale(.98); }
-    .stat .emoji { font-size: 20px; line-height: 1; }
-    .stat strong { display: block; font-size: 24px; line-height: 1.1; margin: 8px 0 3px; letter-spacing: -.04em; word-break: break-word; }
-    .stat small { display: block; color: var(--muted); font-size: 12px; font-weight: 800; }
+    .stat:active { transform: scale(.97); }
+    .stat .emoji { font-size: 13px; line-height: 1; }
+    .stat strong { display: block; font-size: 17px; line-height: 1.1; margin: 3px 0 1px; letter-spacing: -.03em; word-break: break-word; }
+    .stat small { display: block; color: var(--muted); font-size: 10px; font-weight: 800; }
 
-    .panel { border-radius: 26px; padding: 16px; background: var(--card); }
-    .panel.compact { padding: 12px 14px; }
-    .panel-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
-    .panel-head h2 { margin: 0; font-size: 18px; letter-spacing: -.03em; }
-    .panel-head-right { display: flex; align-items: center; gap: 8px; }
-    .panel-head .icon-btn { width: 38px; height: 38px; font-size: 16px; }
+    .panel.compact { padding: 7px 12px; border-radius: 14px; }
+    #lastFeedLine { font-size: 12px; font-weight: 700; }
 
-    .chart { display: flex; gap: 8px; align-items: flex-end; padding: 10px 2px 0; }
-    .chart-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; min-width: 0; }
-    .chart-bar-wrap { width: 100%; height: 110px; display: flex; align-items: flex-end; justify-content: center; }
-    .chart-bar { width: min(100%, 34px); min-height: 4px; border-radius: 10px 10px 4px 4px; background: var(--accent); transition: height .3s ease; }
-    .chart-val { font-size: 11px; font-weight: 800; color: var(--muted); white-space: nowrap; }
-    .chart-day { font-size: 11px; font-weight: 800; color: var(--muted); text-transform: uppercase; }
+    .panel.fill {
+      flex: 1; min-height: 0;
+      display: flex; flex-direction: column;
+      border-radius: 20px; padding: 10px 12px; background: var(--card);
+    }
+
+    .tabs { display: flex; gap: 8px; margin-bottom: 8px; }
+    .tab {
+      flex: 1; padding: 8px 10px; border-radius: 13px;
+      border: 1px solid var(--line); background: var(--bg);
+      font-weight: 800; font-size: 13px; cursor: pointer;
+    }
+    .tab.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+    .tabview { min-height: 0; flex: 1; display: flex; flex-direction: column; }
+    .tabview.hidden { display: none; }
+    .scroll { overflow-y: auto; min-height: 0; flex: 1; -webkit-overflow-scrolling: touch; }
+
+    .mini-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 6px; }
+    .mini-head .muted { font-size: 11px; font-weight: 700; }
+    .mini-head .icon-btn { width: 32px; height: 32px; font-size: 14px; }
+
+    .chart { display: flex; gap: 6px; align-items: flex-end; padding: 8px 2px 0; }
+    .chart-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 0; }
+    .chart-bar-wrap { width: 100%; height: 90px; display: flex; align-items: flex-end; justify-content: center; }
+    .chart-bar { width: min(100%, 30px); min-height: 4px; border-radius: 8px 8px 4px 4px; background: var(--accent); transition: height .3s ease; }
+    .chart-val { font-size: 10px; font-weight: 800; color: var(--muted); white-space: nowrap; }
+    .chart-day { font-size: 10px; font-weight: 800; color: var(--muted); text-transform: uppercase; }
     .chip-button.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+    #chartChips { margin-bottom: 2px; }
+    #chartChips .chip-button { padding: 7px 11px; font-size: 12px; }
 
-    .day { margin: 16px 0 8px; font-size: 12px; font-weight: 900; color: var(--muted); text-transform: uppercase; letter-spacing: .07em; }
+    .day { margin: 10px 0 6px; font-size: 11px; font-weight: 900; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
     .day:first-child { margin-top: 0; }
 
     .event {
-      display: flex; align-items: flex-start; gap: 12px; padding: 12px;
-      border-radius: 20px; background: var(--bg); border: 1px solid var(--line); margin-bottom: 8px;
+      display: flex; align-items: flex-start; gap: 10px; padding: 9px 10px;
+      border-radius: 16px; background: var(--bg); border: 1px solid var(--line); margin-bottom: 6px;
     }
     .event-emoji {
-      width: 40px; height: 40px; border-radius: 15px;
-      display: grid; place-items: center; font-size: 21px;
+      width: 34px; height: 34px; border-radius: 12px;
+      display: grid; place-items: center; font-size: 17px;
       background: var(--card); border: 1px solid var(--line); flex: 0 0 auto;
     }
     .event-body { min-width: 0; flex: 1; }
-    .event-title { font-size: 15px; font-weight: 900; letter-spacing: -.02em; }
-    .event-sub { margin-top: 3px; color: var(--muted); font-size: 13px; line-height: 1.4; font-weight: 600; overflow-wrap: anywhere; }
-    .delete { border: 0; background: transparent; color: var(--muted); font-size: 18px; line-height: 1; padding: 9px; border-radius: 12px; cursor: pointer; flex: 0 0 auto; }
+    .event-title { font-size: 13px; font-weight: 900; letter-spacing: -.02em; }
+    .event-sub { margin-top: 2px; color: var(--muted); font-size: 12px; line-height: 1.35; font-weight: 600; overflow-wrap: anywhere; }
+    .delete { border: 0; background: transparent; color: var(--muted); font-size: 16px; line-height: 1; padding: 7px; border-radius: 10px; cursor: pointer; flex: 0 0 auto; }
 
     .empty {
-      padding: 30px 18px; text-align: center; color: var(--muted);
-      border: 1px dashed var(--line); border-radius: 22px; background: var(--bg);
-      line-height: 1.55; font-weight: 700;
+      padding: 24px 14px; text-align: center; color: var(--muted);
+      border: 1px dashed var(--line); border-radius: 18px; background: var(--bg);
+      line-height: 1.5; font-weight: 700; font-size: 14px;
     }
 
     .modal { position: fixed; inset: 0; z-index: 100; display: none; align-items: flex-end; justify-content: center; background: rgba(25, 12, 20, .48); }
@@ -197,27 +221,27 @@
     }
 
     .sheet-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 4px; }
-    .sheet-head h3 { margin: 0; font-size: 21px; letter-spacing: -.04em; }
+    .sheet-head h3 { margin: 0; font-size: 20px; letter-spacing: -.04em; }
 
-    .field { display: block; margin: 15px 0; }
-    .field-label { display: block; margin-bottom: 8px; font-size: 13px; font-weight: 900; color: var(--muted); }
-    input, textarea { width: 100%; border: 1px solid var(--line); background: var(--bg); border-radius: 16px; padding: 13px 14px; font-size: 16px; }
-    textarea { min-height: 76px; resize: vertical; }
+    .field { display: block; margin: 14px 0; }
+    .field-label { display: block; margin-bottom: 7px; font-size: 13px; font-weight: 900; color: var(--muted); }
+    input, textarea { width: 100%; border: 1px solid var(--line); background: var(--bg); border-radius: 16px; padding: 12px 14px; font-size: 16px; }
+    textarea { min-height: 70px; resize: vertical; }
 
     .chips { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px; scrollbar-width: none; }
     .chips::-webkit-scrollbar { display: none; }
     .chip { position: relative; flex: 0 0 auto; }
     .chip input { position: absolute; opacity: 0; width: 1px; height: 1px; margin: 0; }
     .chip span, .chip-button {
-      display: inline-flex; align-items: center; gap: 6px; padding: 11px 14px;
+      display: inline-flex; align-items: center; gap: 6px; padding: 10px 13px;
       border-radius: 999px; border: 1px solid var(--line); background: var(--bg);
       font-weight: 800; white-space: nowrap; cursor: pointer; user-select: none;
     }
     .chip-button { flex: 0 0 auto; }
     .chip input:checked + span { background: var(--accent); border-color: var(--accent); color: #fff; box-shadow: 0 10px 22px rgba(255, 127, 165, .22); }
 
-    .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 18px; }
-    .btn { border: 0; border-radius: 18px; min-height: 52px; padding: 14px 16px; font-weight: 900; cursor: pointer; letter-spacing: -.02em; }
+    .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 16px; }
+    .btn { border: 0; border-radius: 18px; min-height: 50px; padding: 13px 16px; font-weight: 900; cursor: pointer; letter-spacing: -.02em; }
     .btn-primary { background: var(--accent); color: #fff; }
     .btn-ghost { background: var(--bg); border: 1px solid var(--line); color: var(--text); }
     .btn-danger { background: rgba(255, 90, 110, .12); color: var(--danger); border: 1px solid rgba(255, 90, 110, .18); }
@@ -292,29 +316,32 @@
       <div id="lastFeedLine" class="muted">Ultima poppata: —</div>
     </section>
 
-    <section class="panel">
-      <div class="panel-head">
-        <h2>Ultimi 7 giorni</h2>
+    <section class="panel fill">
+      <div class="tabs">
+        <button id="tabEvents" class="tab active" type="button">📋 Eventi</button>
+        <button id="tabChart" class="tab" type="button">📊 Grafici</button>
       </div>
-      <div class="chips" id="chartChips">
-        <button class="chip-button" type="button" data-metric="poppate">🍼 Poppate</button>
-        <button class="chip-button" type="button" data-metric="latte">⏱️ Latte</button>
-        <button class="chip-button" type="button" data-metric="cacca">💩 Cacca</button>
-        <button class="chip-button" type="button" data-metric="pipi">💧 Pipì</button>
-        <button class="chip-button" type="button" data-metric="sonno">😴 Sonno</button>
-      </div>
-      <div id="chartBox" class="chart"></div>
-    </section>
 
-    <section class="panel">
-      <div class="panel-head">
-        <h2>Ultimi eventi</h2>
-        <div class="panel-head-right">
+      <div id="viewEvents" class="tabview">
+        <div class="mini-head">
           <span id="eventCount" class="muted"></span>
           <button id="btnExportAction" class="icon-btn" type="button" aria-label="Esporta dati">📤</button>
         </div>
+        <div class="scroll">
+          <div id="events"></div>
+        </div>
       </div>
-      <div id="events"></div>
+
+      <div id="viewChart" class="tabview hidden">
+        <div class="chips" id="chartChips">
+          <button class="chip-button" type="button" data-metric="poppate">🍼 Poppate</button>
+          <button class="chip-button" type="button" data-metric="latte">⏱️ Latte</button>
+          <button class="chip-button" type="button" data-metric="cacca">💩 Cacca</button>
+          <button class="chip-button" type="button" data-metric="pipi">💧 Pipì</button>
+          <button class="chip-button" type="button" data-metric="sonno">😴 Sonno</button>
+        </div>
+        <div id="chartBox" class="chart"></div>
+      </div>
     </section>
   </main>
 
@@ -405,6 +432,7 @@
       <div class="sheet-head"><h3 id="titleExport">📤 Esporta dati</h3><button class="icon-btn" type="button" data-close aria-label="Chiudi">✕</button></div>
       <p class="muted">Il CSV va bene per Excel o Google Sheets. Il JSON è un backup completo e può essere reimportato.</p>
       <div class="btn-row"><button id="btnCsv" class="btn btn-primary" type="button">📊 CSV</button><button id="btnJson" class="btn btn-ghost" type="button">💾 JSON</button></div>
+      <button id="btnSync" class="btn btn-primary btn-wide mt" type="button">☁️ Salva file sync</button>
       <label class="btn btn-ghost btn-wide mt">📥 Importa JSON<input id="importFile" type="file" accept="application/json,.json" hidden></label>
       <button class="btn btn-ghost btn-wide mt" type="button" data-close>Chiudi</button>
     </div>
@@ -864,6 +892,15 @@
       });
     }
 
+    function switchTab(which) {
+      const isEvents = which === 'events';
+      $('#tabEvents').classList.toggle('active', isEvents);
+      $('#tabChart').classList.toggle('active', !isEvents);
+      $('#viewEvents').classList.toggle('hidden', !isEvents);
+      $('#viewChart').classList.toggle('hidden', isEvents);
+      if (!isEvents) renderChart();
+    }
+
     function clockText(startAt) {
       const diff = Math.max(0, Date.now() - startAt);
       const total = Math.floor(diff / 1000);
@@ -919,7 +956,7 @@
       renderSummary();
       renderEvents();
       renderTimers();
-      renderChart();
+      if (!$('#viewChart').classList.contains('hidden')) renderChart();
       const listModal = $('#modalList');
       if (listModal && listModal.classList.contains('open') && currentListType) renderListModal();
       rescheduleReminder();
@@ -1151,6 +1188,12 @@
       }
     }
 
+    function openSettings() {
+      $('#setRemindHours').value = settings.remindHours;
+      $('#setAutoBackup').checked = !!settings.autoBackup;
+      openModal('#modalSettings');
+    }
+
     function bindUi() {
       $('#btnPee').addEventListener('click', openPee);
       $('#btnPoop').addEventListener('click', openPoop);
@@ -1158,6 +1201,9 @@
       $('#btnSonno').addEventListener('click', openSonno);
       $('#btnSettings').addEventListener('click', openSettings);
       $('#btnExportAction').addEventListener('click', function () { openModal('#modalExport'); });
+
+      $('#tabEvents').addEventListener('click', function () { switchTab('events'); });
+      $('#tabChart').addEventListener('click', function () { switchTab('chart'); });
 
       $$('.stat[data-list]').forEach(function (button) {
         button.addEventListener('click', function () { openList(button.getAttribute('data-list')); });
@@ -1290,6 +1336,13 @@
         if (done) toast('Backup JSON creato 💾');
       });
 
+      $('#btnSync').addEventListener('click', async function () {
+        if (!events.length) { toast('Nessun dato da sincronizzare'); return; }
+        closeModal('#modalExport');
+        const done = await exportFile('registro-neonato-sync.json', 'application/json', toJSON());
+        if (done) toast('File sync salvato ☁️');
+      });
+
       $('#importFile').addEventListener('change', async function (event) {
         const file = event.target.files && event.target.files[0];
         if (!file) return;
@@ -1326,12 +1379,6 @@
       });
     }
 
-    function openSettings() {
-      $('#setRemindHours').value = settings.remindHours;
-      $('#setAutoBackup').checked = !!settings.autoBackup;
-      openModal('#modalSettings');
-    }
-
     events = loadEvents();
     timers = loadTimers();
 
@@ -1350,7 +1397,7 @@
     });
 
     setInterval(function () {
-      if (!document.hidden) { renderTopDate(); renderSummary(); renderChart(); }
+      if (!document.hidden) { renderTopDate(); renderSummary(); }
     }, 60000);
   </script>
 </body>
