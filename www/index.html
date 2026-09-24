@@ -298,13 +298,12 @@
     </section>
 
     <section class="stats">
-      <button class="stat" type="button" data-list="pipi"><span class="emoji">💧</span><strong id="statPee">0</strong><small>Pipì oggi</small></button>
-      <button class="stat" type="button" data-list="cacca"><span class="emoji">💩</span><strong id="statPoop">0</strong><small>Cacca oggi</small></button>
-      <button class="stat" type="button" data-list="poppata"><span class="emoji">🤱</span><strong id="statFeed">0</strong><small>Poppate oggi</small></button>
-      <button class="stat" type="button" data-list="poppata"><span class="emoji">⏱️</span><strong id="statFeedTime">0 min</strong><small>Latte oggi</small></button>
-      <button class="stat" type="button" data-list="sonno"><span class="emoji">😴</span><strong id="statNap">0</strong><small>Nanne oggi</small></button>
-      <button class="stat" type="button" data-list="sonno"><span class="emoji">🌙</span><strong id="statSleep">0 min</strong><small>Sonno oggi</small></button>
-    </section>
+      <button class="stat" type="button" data-list="pipi"><span class="emoji">💧</span><strong id="statPee">0</strong><small>Pipì</small></button>
+      <button class="stat" type="button" data-list="cacca"><span class="emoji">💩</span><strong id="statPoop">0</strong><small>Cacca</small></button>
+      <button class="stat" type="button" data-list="poppata"><span class="emoji">🤱</span><strong id="statFeed">0</strong><small>Poppate</small></button>
+      <button class="stat" type="button" data-list="poppata"><span class="emoji">⏱️</span><strong id="statFeedTime">0 min</strong><small>Latte</small></button>
+      <button class="stat" type="button" data-list="sonno"><span class="emoji">😴</span><strong id="statNap">0</strong><small>Nanne</small></button>
+      <button class="stat" type="button" data-list="sonno"><span class="emoji">🌙</span><strong id="statSleep">0 min</strong><small>Sonno</small></button>    </section>
 
     <section class="measure-row">
       <button id="btnMisura" class="action green" type="button">
@@ -327,8 +326,8 @@
       </div>
       <div class="filter-row">
         <div class="chips" id="filterChips">
-          <button class="chip-button active" type="button" data-filter="all">Tutti</button>
-          <button class="chip-button" type="button" data-filter="today">Oggi</button>
+          <button class="chip-button" type="button" data-filter="all">Tutti</button>
+          <button class="chip-button active" type="button" data-filter="today">Oggi</button>
           <button class="chip-button" type="button" data-filter="yesterday">Ieri</button>
         </div>
         <input id="filterDate" type="date" aria-label="Filtra per giorno">
@@ -500,7 +499,7 @@
     let toastTimeout = null;
     let currentListType = null;
     let backupTimeout = null;
-    let filterMode = 'all';
+    let filterMode = 'today';
     let filterDay = '';
     let eventsLimit = 20;
     let settings = loadSettings();
@@ -823,13 +822,7 @@
     }
 
     function countLabel(base) {
-      if (filterMode === 'all' || filterMode === 'today') return base + ' oggi';
-      if (filterMode === 'yesterday') return base + ' · ieri';
-      if (filterMode === 'day' && filterDay) {
-        const d = new Date(filterDay + 'T12:00');
-        return base + ' · ' + d.getDate() + ' ' + d.toLocaleDateString('it-IT', { month: 'short' });
-      }
-      return base + ' oggi';
+      return base;
     }
 
     function renderSummary() {
@@ -966,7 +959,7 @@
       else if (filterMode === 'day' && filterDay) {
         const d = new Date(filterDay + 'T12:00');
         $('#eventsTitle').textContent = 'Eventi del ' + d.toLocaleDateString('it-IT', { day: 'numeric', month: 'long' });
-      } else $('#eventsTitle').textContent = 'Ultimi eventi';
+      } else $('#eventsTitle').textContent = 'Tutti gli eventi';
 
       if (!limited.length) {
         container.innerHTML = events.length
