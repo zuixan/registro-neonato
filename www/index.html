@@ -270,7 +270,6 @@
       <p id="topDate">Caricamento…</p>
     </div>
     <div class="topbar-btns">
-      <button id="btnAbout" class="icon-btn" type="button" aria-label="Informazioni e contatti">ℹ️</button>
       <button id="btnSettings" class="icon-btn" type="button" aria-label="Impostazioni">⚙️</button>
       <button id="themeBtn" class="icon-btn" type="button" aria-label="Cambia tema">🌙</button>
     </div>
@@ -470,27 +469,6 @@
         <button id="btnSaveSettings" class="btn btn-primary" type="button">Salva</button>
       </div>
       <span class="hint">Promemoria, notifiche timer e backup automatico funzionano nell'APK. Il backup si chiama registro-neonato-autobackup.json nella cartella Documenti.</span>
-    </div>
-  </div>
-  <div id="modalAbout" class="modal">
-    <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="titleAbout">
-      <div class="sheet-head"><h3 id="titleAbout">ℹ️ About</h3><button class="icon-btn" type="button" data-close aria-label="Chiudi">✕</button></div>
-      <p class="muted"><strong id="aboutName">Registro Neonato</strong> · <span id="aboutVersion">versione web</span></p>
-      <p class="muted" style="line-height:1.5;">
-        Diario di famiglia per poppate, pannolini, nanne e crescita.<br>
-        I dati restano <strong>solo sul tuo dispositivo</strong>: nessun account, nessun server, nessuna pubblicità.<br>
-        Software libero con licenza MIT: prendilo, modificalo, condividilo.
-      </p>
-	<!-- <p class="muted" id="aboutMailLine" style="cursor:pointer; text-decoration:underline dotted;">✉️ —</p> -->      
-      <div class="btn-row">
-        <button id="btnRepo" class="btn btn-ghost" type="button">🐙 Repository</button>
-        <button id="btnIssues" class="btn btn-ghost" type="button">🐞 Problemi</button>
-      </div>
-      <div class="btn-row">
-	<button id="btnMail" class="btn btn-ghost" type="button" onclick="document.getElementById('btnIssues').click()">✉️ Scrivimi</button>
-        <button id="btnChangelog" class="btn btn-ghost" type="button">📜 Novità</button>
-      </div>
-      <span class="hint">Codice, build e changelog sono pubblici sul repository. Per contattarmi: email o GitHub Issues.</span>
     </div>
   </div>
 
@@ -1481,36 +1459,6 @@
         openModal('#modalSonno');
       }
     }
-    const REPO_URL = 'https://github.com/zuixan/registro-neonato';
-    const CONTACT_MAIL = ''; // disabilitato: usa Issues
-
-    async function openExternal(url) {
-      if (url.indexOf('mailto:') === 0) {
-        window.location.href = url;
-        return;
-      }
-      const Browser = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Browser;
-      if (Browser) {
-        try { await Browser.open({ url: url }); return; } catch (error) { console.warn(error); }
-      }
-      window.open(url, '_blank');
-    }
-
-    function openAbout() {
-      $('#aboutName').textContent = settings.name ? 'Registro Neonato · ' + settings.name : 'Registro Neonato';
-      $('#aboutMailLine').textContent = '✉️ ' + CONTACT_MAIL + ' (tocca per copiare)';
-      const App = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App;
-      if (App && App.getInfo) {
-        App.getInfo().then(function (info) {
-          $('#aboutVersion').textContent = 'versione ' + info.version;
-        }).catch(function () {
-          $('#aboutVersion').textContent = 'versione web';
-        });
-      } else {
-        $('#aboutVersion').textContent = 'versione web';
-      }
-      openModal('#modalAbout');
-    }
 
     function openSettings() {
       $('#setName').value = settings.name || '';
@@ -1526,12 +1474,6 @@
       $('#btnSonno').addEventListener('click', openSonno);
       $('#btnMisura').addEventListener('click', openMisura);
       $('#btnSettings').addEventListener('click', openSettings);
-      $('#btnAbout').addEventListener('click', openAbout);
-      $('#btnRepo').addEventListener('click', function () { openExternal(REPO_URL); });
-      $('#btnIssues').addEventListener('click', function () { openExternal(REPO_URL + '/issues'); });
-      $('#btnChangelog').addEventListener('click', function () { openExternal(REPO_URL + '/blob/main/CHANGELOG.md'); });
-      $('#btnMail').addEventListener('click', function () { openExternal('mailto:' + CONTACT_MAIL); });
-      $('#aboutMailLine').addEventListener('click', function () { copyToClipboard(CONTACT_MAIL); });
       $('#btnExportAction').addEventListener('click', function () { openModal('#modalExport'); });
 
       $('#lastMeasureLine').addEventListener('click', function () { openList('misura'); });
