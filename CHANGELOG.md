@@ -4,6 +4,9 @@ _Generato automaticamente dai commit su `main`: ogni push aggiorna questo file._
 
 Per l'APK di ogni versione vedi [Releases](../../releases).
 
+- **2026-09-26** — Aggiungo LICENSE MIT e aggiorno package.json
+- **2026-09-26** — Rollback: ripristino index.html alla versione stabile pre-sync
+- **2026-09-25** — chore: aggiorna CHANGELOG [skip ci]
 - **2026-09-25** — UX: sostituisco mail con GitHub Issues nei contatti
 - **2026-09-24** — chore: aggiorna CHANGELOG [skip ci]
 - **2026-09-24** — UX: contatori con etichette neutre e filtro predefinito su Oggi
