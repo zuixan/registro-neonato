@@ -158,7 +158,17 @@
     .stat small { display: block; color: var(--muted); font-size: 12px; font-weight: 800; }
 
     .panel { border-radius: 26px; padding: 16px; background: var(--card); }
-    .panel.compact { padding: 12px 14px; border-radius: 18px; }
+    .panel.compact { padding: 10px 12px; border-radius: 16px; }
+    .compact-row { display: flex; gap: 10px; align-items: center; }
+    .compact-icon { font-size: 20px; flex: 0 0 auto; }
+    .compact-info { flex: 1; min-width: 0; }
+    .compact-title { font-size: 12px; font-weight: 800; color: var(--muted); margin-bottom: 2px; }
+    .compact-value { font-size: 14px; font-weight: 900; }
+    .compact-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+    .events-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+    .events-grid .event { margin-bottom: 0; }
+    .events-grid .day { grid-column: 1 / -1; margin: 12px 0 6px; }
     #lastFeedLine { font-size: 13px; font-weight: 700; }
     .measure-line { margin-top: 4px; font-size: 13px; font-weight: 700; cursor: pointer; text-decoration: underline dotted; text-underline-offset: 3px; }
 
@@ -305,15 +315,22 @@
       <button class="stat" type="button" data-list="aggiunta"><span class="emoji">🍼</span><strong id="statAggiunte">0</strong><small>Aggiunte</small></button>
       <button class="stat" type="button" data-list="aggiunta"><span class="emoji"></span><strong id="statAggiunteMl">0 ml</strong><small>Latte aggiunto</small></button>
 
-    <section class="measure-row">
-      <button id="btnMisura" class="action green" type="button">
-        <span class="big">📏</span><span class="label">Misura · peso e altezza</span>
-      </button>
-    </section>
-
     <section class="panel compact">
-      <div id="lastFeedLine" class="muted">Ultima poppata: —</div>
-      <div id="lastMeasureLine" class="muted measure-line" role="button" tabindex="0">Ultima misura: —</div>
+      <div class="compact-row" style="margin-bottom: 8px;">
+        <span class="compact-icon">📏</span>
+        <div class="compact-info">
+          <div class="compact-title">Ultima misura</div>
+          <div class="compact-value" id="lastMeasureValue">—</div>
+          <div class="compact-sub" id="lastMeasureTime">Nessuna misura registrata</div>
+        </div>
+        <button id="btnMisura" class="icon-btn" type="button" aria-label="Aggiungi misura" style="width: 36px; height: 36px; font-size: 16px;">+</button>
+      </div>
+      <div class="compact-row">
+        <span class="compact-icon">🍼</span>
+        <div class="compact-info">
+          <div class="compact-value" id="lastFeedLine">Ultima poppata: —</div>
+        </div>
+      </div>
     </section>
 
     <section class="panel">
@@ -332,7 +349,7 @@
         </div>
         <input id="filterDate" type="date" aria-label="Filtra per giorno">
       </div>
-      <div id="events"></div>
+      <div id="events" class="events-grid"></div>
     </section>
   </main>
 
@@ -1010,13 +1027,17 @@
       }
 
       const m = lastMeasure();
-      const mLine = $('#lastMeasureLine');
-      if (!m) { mLine.textContent = 'Ultima misura: —'; }
-      else {
+      const mValue = $('#lastMeasureValue');
+      const mTime = $('#lastMeasureTime');
+      if (!m) {
+        mValue.textContent = '—';
+        mTime.textContent = 'Nessuna misura registrata';
+      } else {
         const parts = [];
-        if (m.weightKg != null) parts.push('⚖️ ' + fmtDec(m.weightKg) + ' kg');
-        if (m.heightCm != null) parts.push('📏 ' + fmtDec(m.heightCm) + ' cm');
-        mLine.textContent = 'Ultima misura: ' + (parts.join(' · ') || '—') + ' · ' + fmtDayLabel(m.when) + ' (tocca per lo storico)';
+        if (m.weightKg != null) parts.push(fmtDec(m.weightKg) + ' kg');
+        if (m.heightCm != null) parts.push(fmtDec(m.heightCm) + ' cm');
+        mValue.textContent = parts.join(' · ') || '—';
+        mTime.textContent = fmtDayLabel(m.when) + ' · ' + ago(m.when);
       }
     }
 
@@ -1607,7 +1628,9 @@
       $('#btnSettings').addEventListener('click', openSettings);
       $('#btnExportAction').addEventListener('click', function () { openModal('#modalExport'); });
 
-      $('#lastMeasureLine').addEventListener('click', function () { openList('misura'); });
+      $('#btnMisura').addEventListener('click', openMisura);
+      $('#lastMeasureValue').addEventListener('click', function () { openList('misura'); });
+      $('#lastMeasureTime').addEventListener('click', function () { openList('misura'); });
 
       $$('.stat[data-list]').forEach(function (button) {
         button.addEventListener('click', function () { openList(button.getAttribute('data-list')); });
