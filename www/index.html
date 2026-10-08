@@ -292,8 +292,8 @@
       <button id="btnPoop" class="action brown" type="button">
         <span class="big">💩</span><span class="label">Cacca</span>
       </button>
-      <button id="btnAggiunta" class="action violet" type="button">
-        <span class="big">🍼</span><span class="label">Aggiunta</span>
+      <button id="btnSonno" class="action violet" type="button">
+        <span class="big">😴</span><span class="label">Sonno</span>
       </button>
     </section>
 
@@ -302,8 +302,8 @@
       <button class="stat" type="button" data-list="cacca"><span class="emoji">💩</span><strong id="statPoop">0</strong><small>Cacca</small></button>
       <button class="stat" type="button" data-list="poppata"><span class="emoji">🤱</span><strong id="statFeed">0</strong><small>Poppate</small></button>
       <button class="stat" type="button" data-list="poppata"><span class="emoji">⏱️</span><strong id="statFeedTime">0 min</strong><small>Latte</small></button>
-      <button class="stat" type="button" data-list="aggiunta"><span class="emoji">🍼</span><strong id="statAggiunte">0</strong><small>Aggiunte</small></button>
-      <button class="stat" type="button" data-list="aggiunta"><span class="emoji">🥛</span><strong id="statAggiunteMl">0 ml</strong><small>Latte aggiunto</small></button>
+      <button class="stat" type="button" data-list="sonno"><span class="emoji">😴</span><strong id="statNap">0</strong><small>Nanne</small></button>
+      <button class="stat" type="button" data-list="sonno"><span class="emoji">🌙</span><strong id="statSleep">0 min</strong><small>Sonno</small></button>    </section>
 
     <section class="measure-row">
       <button id="btnMisura" class="action green" type="button">
@@ -399,28 +399,21 @@
     </div>
   </div>
 
-  <div id="modalAggiunta" class="modal">
-    <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="titleAggiunta">
-      <div class="sheet-head"><h3 id="titleAggiunta">🍼 Aggiunta</h3><button class="icon-btn" type="button" data-close aria-label="Chiudi">✕</button></div>
-      <form id="formAggiunta">
-        <div class="field">
-          <span class="field-label">Tipo di latte</span>
-          <div class="chips">
-            <label class="chip"><input type="radio" name="milkType" value="materno" required><span>🤱 Materno</span></label>
-            <label class="chip"><input type="radio" name="milkType" value="artificiale"><span>🍼 Artificiale</span></label>
-          </div>
-        </div>
-        <label class="field"><span class="field-label">Quando</span><input id="aggiuntaWhen" type="datetime-local" required></label>
-        <label class="field"><span class="field-label">Quantità (ml)</span><input id="aggiuntaMl" type="number" inputmode="numeric" min="1" max="500" step="5" placeholder="Es. 90"></label>
+  <div id="modalSonno" class="modal">
+    <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="titleSonno">
+      <div class="sheet-head"><h3 id="titleSonno">😴 Sonno</h3><button class="icon-btn" type="button" data-close aria-label="Chiudi">✕</button></div>
+      <form id="formSonno">
+        <label class="field"><span class="field-label">Quando si è addormentato</span><input id="sonnoWhen" type="datetime-local" required></label>
+        <label class="field"><span class="field-label">Durata in minuti</span><input id="sonnoDuration" type="number" inputmode="numeric" min="1" max="1440" step="1" placeholder="Es. 90"></label>
         <div class="chips">
-          <button class="chip-button" type="button" data-ml="30">30 ml</button>
-          <button class="chip-button" type="button" data-ml="60">60 ml</button>
-          <button class="chip-button" type="button" data-ml="90">90 ml</button>
-          <button class="chip-button" type="button" data-ml="120">120 ml</button>
-          <button class="chip-button" type="button" data-ml="150">150 ml</button>
+          <button class="chip-button" type="button" data-minutes="30">30 min</button>
+          <button class="chip-button" type="button" data-minutes="60">1 h</button>
+          <button class="chip-button" type="button" data-minutes="90">1 h 30</button>
+          <button class="chip-button" type="button" data-minutes="120">2 h</button>
+          <button class="chip-button" type="button" data-minutes="180">3 h</button>
         </div>
-        <label class="field"><span class="field-label">Note</span><textarea id="aggiuntaNote" maxlength="300" placeholder="Facoltativo"></textarea></label>
-        <div class="btn-row"><button class="btn btn-ghost" type="button" data-close>Annulla</button><button class="btn btn-primary" type="submit">Salva</button></div>
+        <label class="field"><span class="field-label">Note</span><textarea id="sonnoNote" maxlength="300" placeholder="Facoltativo"></textarea></label>
+        <div class="btn-row"><button id="btnStartSonnoTimer" class="btn btn-ghost" type="button">⏱️ Avvia timer</button><button class="btn btn-primary" type="submit">💾 Salva</button></div>
       </form>
     </div>
   </div>
@@ -515,7 +508,7 @@
       pipi: { label: 'Pipì', emoji: '💧' },
       cacca: { label: 'Cacca', emoji: '💩' },
       poppata: { label: 'Poppata', emoji: '🍼' },
-      aggiunta: { label: 'Aggiunta', emoji: '🥛' },
+      sonno: { label: 'Sonno', emoji: '😴' },
       misura: { label: 'Misura', emoji: '📏' }
     };
 
@@ -523,13 +516,8 @@
       pipi: 'Elenco pipì',
       cacca: 'Elenco cacca',
       poppata: 'Elenco poppate',
-      aggiunta: 'Elenco aggiunte',
+      sonno: 'Elenco nanne',
       misura: 'Elenco misure'
-    };
-
-    const MILK_TYPES = {
-      materno: { label: 'Latte materno', emoji: '🤱' },
-      artificiale: { label: 'Latte artificiale', emoji: '🍼' }
     };
 
     const SIDE_META = {
@@ -749,9 +737,7 @@
         poopColor: POOP_COLORS[data.poopColor] ? data.poopColor : null,
         weightKg: data.weightKg != null ? Number(data.weightKg) : null,
         heightCm: data.heightCm != null ? Number(data.heightCm) : null,
-        milkType: data.milkType || null,
-        amountMl: data.amountMl != null ? Number(data.amountMl) : null,        
-	note: String(data.note || ''),
+        note: String(data.note || ''),
         createdAt: new Date().toISOString()
       };
       events.push(event);
@@ -790,9 +776,7 @@
           poopColor: POOP_COLORS[raw.poopColor] ? raw.poopColor : null,
           weightKg: raw.weightKg != null ? Number(raw.weightKg) : null,
           heightCm: raw.heightCm != null ? Number(raw.heightCm) : null,
-          milkType: data.milkType || null,
-          amountMl: data.amountMl != null ? Number(data.amountMl) : null,
-	  note: String(raw.note || ''),
+          note: String(raw.note || ''),
           createdAt: raw.createdAt || new Date().toISOString()
         };
         if (!map.has(event.id)) added++;
@@ -847,17 +831,17 @@
       const pees = targetEvents.filter(e => e.type === 'pipi');
       const poops = targetEvents.filter(e => e.type === 'cacca');
       const feeds = targetEvents.filter(e => e.type === 'poppata');
-      const additions = targetEvents.filter(e => e.type === 'aggiunta');
+      const naps = targetEvents.filter(e => e.type === 'sonno');
 
       const feedMinutes = feeds.reduce((s, e) => s + (Number(e.durationMin) || 0), 0);
-      const addedMl = additions.reduce((s, e) => s + (Number(e.amountMl) || 0), 0);
+      const sleepMinutes = naps.reduce((s, e) => s + (Number(e.durationMin) || 0), 0);
 
       $('#statPee').textContent = pees.length;
       $('#statPoop').textContent = poops.length;
       $('#statFeed').textContent = feeds.length;
       $('#statFeedTime').textContent = fmtDuration(feedMinutes);
-      $('#statAggiunte').textContent = additions.length;
-      $('#statAggiunteMl').textContent = addedMl + ' ml';
+      $('#statNap').textContent = naps.length;
+      $('#statSleep').textContent = fmtDuration(sleepMinutes);
 
       // Etichette dinamiche
       const labels = [
@@ -906,10 +890,8 @@
       } else if (event.type === 'cacca') {
         const color = POOP_COLORS[event.poopColor];
         if (color) parts.push(color.emoji + ' ' + color.label);
-      } else if (event.type === 'aggiunta') {
-        const milk = MILK_TYPES[event.milkType];
-        if (milk) parts.push(milk.emoji + ' ' + milk.label);
-        if (event.amountMl) parts.push(event.amountMl + ' ml');
+      } else if (event.type === 'sonno') {
+        if (event.durationMin) parts.push('🌙 ' + fmtDuration(event.durationMin));
       } else if (event.type === 'misura') {
         if (event.weightKg != null) parts.push('⚖️ ' + fmtDec(event.weightKg) + ' kg');
         if (event.heightCm != null) parts.push('📏 ' + fmtDec(event.heightCm) + ' cm');
@@ -1025,7 +1007,7 @@
     }
 
     function updateTimerClocks() {
-      ['poppata'].forEach(function (type) {
+      ['poppata', 'sonno'].forEach(function (type) {
         const el = document.querySelector('[data-clock="' + type + '"]');
         if (el && timers[type]) el.textContent = clockTextMs(elapsedMs(timers[type]));
       });
@@ -1042,13 +1024,13 @@
 
     function renderTimers() {
       const box = $('#timersBox');
-      const active = ['poppata'].filter(function (t) { return timers[t]; });
+      const active = ['poppata', 'sonno'].filter(function (t) { return timers[t]; });
       if (!active.length) { box.innerHTML = ''; stopClock(); return; }
 
       box.innerHTML = active.map(function (type) {
         const t = timers[type];
         const paused = isPaused(t);
-        const title = '🤱 Poppata in corso';
+        const title = type === 'poppata' ? '🤱 Poppata in corso' : '😴 Nanna in corso';
         const side = type === 'poppata' && SIDE_META[t.side]
           ? '<div class="muted">' + SIDE_META[t.side].emoji + ' ' + SIDE_META[t.side].label + '</div>'
           : '';
@@ -1125,11 +1107,14 @@
       openModal('#modalFeed');
     }
 
-    function openAggiunta() {
+    function openSonno() {
       editingId = null;
-      $('#formAggiunta').reset();
-      $('#aggiuntaWhen').value = toLocalInput();
-      openModal('#modalAggiunta');
+      $('#formSonno').reset();
+      timerEditType = null;
+      $('#sonnoWhen').value = toLocalInput();
+      $('#sonnoDuration').value = '';
+      $('#btnStartSonnoTimer').style.display = '';
+      openModal('#modalSonno');
     }
 
     function openMisura() {
@@ -1169,17 +1154,14 @@
         $('#feedNote').value = ev.note || '';
         $('#btnStartTimer').style.display = 'none';
         openModal('#modalFeed');
-      } else if (ev.type === 'aggiunta') {
-        $('#formAggiunta').reset();
-        $('#aggiuntaWhen').value = toLocalInput(new Date(ev.when));
-        if (ev.milkType) {
-          const r = $('#formAggiunta input[name="milkType"][value="' + ev.milkType + '"]');
-          if (r) r.checked = true;
-        }
-        $('#aggiuntaMl').value = ev.amountMl || '';
-        $('#aggiuntaNote').value = ev.note || '';
-        openModal('#modalAggiunta');
-      } else if (ev.type === 'misura') {     
+      } else if (ev.type === 'sonno') {
+        $('#formSonno').reset();
+        $('#sonnoWhen').value = toLocalInput(new Date(ev.when));
+        $('#sonnoDuration').value = ev.durationMin || '';
+        $('#sonnoNote').value = ev.note || '';
+        $('#btnStartSonnoTimer').style.display = 'none';
+        openModal('#modalSonno');
+      } else if (ev.type === 'misura') {
         $('#formMisura').reset();
         $('#misuraWhen').value = toLocalInput(new Date(ev.when));
         $('#misuraWeight').value = ev.weightKg != null ? fmtDec(ev.weightKg) : '';
@@ -1371,7 +1353,7 @@
     }
 
     function syncTimerNotifications() {
-      ['poppata'].forEach(function (type) { updateTimerNotification(type); });
+      ['poppata', 'sonno'].forEach(function (type) { updateTimerNotification(type); });
     }
 
     async function rescheduleReminder() {
@@ -1446,7 +1428,8 @@
       if (!t) return;
       const minutes = timerMinutes(t);
       const when = t.when || new Date(t.startAt).toISOString();
-      addEvent({ type: 'poppata', when: when, side: t.side, durationMin: minutes, note: '' });
+      if (type === 'poppata') addEvent({ type: 'poppata', when: when, side: t.side, durationMin: minutes, note: '' });
+      else addEvent({ type: 'sonno', when: when, durationMin: minutes, note: '' });
       delete timers[type];
       persistTimers();
       clearTimerNotification(type);
@@ -1488,7 +1471,7 @@
       $('#btnPee').addEventListener('click', openPee);
       $('#btnPoop').addEventListener('click', openPoop);
       $('#btnFeed').addEventListener('click', openFeed);
-      $('#btnAggiunta').addEventListener('click', openAggiunta);
+      $('#btnSonno').addEventListener('click', openSonno);
       $('#btnMisura').addEventListener('click', openMisura);
       $('#btnSettings').addEventListener('click', openSettings);
       $('#btnExportAction').addEventListener('click', function () { openModal('#modalExport'); });
@@ -1565,13 +1548,6 @@
           const modal = button.closest('.modal');
           const input = modal ? modal.querySelector('input[type="number"]') : null;
           if (input) input.value = button.getAttribute('data-minutes');
-        });
-      });
-
-      $$('.chip-button[data-ml]').forEach(function (button) {
-        button.addEventListener('click', function () {
-          const input = $('#aggiuntaMl');
-          if (input) input.value = button.getAttribute('data-ml');
         });
       });
 
@@ -1652,25 +1628,6 @@
         if (timerEditType === 'sonno') { delete timers.sonno; persistTimers(); clearTimerNotification('sonno'); }
         timerEditType = null;
         closeModal('#modalSonno');
-      });
-
-      $('#formAggiunta').addEventListener('submit', function (event) {
-        event.preventDefault();
-        const milkType = getRadioValue('#formAggiunta', 'milkType');
-        if (!milkType) { toast('Scegli il tipo di latte'); return; }
-        const amountMl = parseInt($('#aggiuntaMl').value, 10);
-        if (!amountMl || amountMl <= 0) { toast('Inserisci la quantità in ml'); return; }
-        const when = fromLocalInput($('#aggiuntaWhen').value);
-        const note = $('#aggiuntaNote').value.trim();
-        if (editingId) {
-          updateEvent(editingId, { when: when.toISOString(), milkType: milkType, amountMl: amountMl, note: note });
-          editingId = null;
-          toast('Aggiunta aggiornata ✏️');
-        } else {
-          addEvent({ type: 'aggiunta', when: when.toISOString(), milkType: milkType, amountMl: amountMl, note: note });
-          toast('Aggiunta salvata 🍼');
-        }
-        closeModal('#modalAggiunta');
       });
 
       $('#formMisura').addEventListener('submit', function (event) {
